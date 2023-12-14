@@ -1,0 +1,45 @@
+{
+  "name": "pyknights",
+  "displayName": "PyKnights",
+  "description": "Code highlight and auto completion for python",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [{
+      "command": "pyknights.helloWorld",
+      "title": "Hello World"
+    }],
+    "colors": [{
+      "id": "pyknights.color1",
+      "description": "The color used for the status bar background.",
+      "defaults": {
+        "dark": "#00FF00",
+        "light": "#00FF00",
+        "highContrast": "#00FF00"
+      }
+    }]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8"
+  }
+}
