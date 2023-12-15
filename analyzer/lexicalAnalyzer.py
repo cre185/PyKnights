@@ -91,8 +91,8 @@ class LexicalAnalyzer:
             i+=1
         if j < len(tokens):
             print("Warning: Unrecognized token from: ", tokens[j:] if len(tokens[j:]) < 100 else tokens[j:j+100] + "...")
-        # remove spaces
-        token_list = [token for token in token_list if token.tokenType != TokenType.space]
+        # remove spaces for testing
+        # token_list = [token for token in token_list if not (token.tokenType == TokenType.space and token.token == " ")]
         return token_list
 
 
