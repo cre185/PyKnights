@@ -36,6 +36,6 @@ while lives > 0:
 
 
 if guessed_word_correctly:
-    print('你赢了! 秘密单词是 ' + secret_word)
+    print('You win! The secret word is ' + secret_word)
 else:
-    print('你输了! 秘密单词是 ' + secret_word)
+    print('You lose! The secret word is ' + secret_word)
