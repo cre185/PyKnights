@@ -49,6 +49,8 @@ class LexicalAnalyzer:
             else:
                 result_nfa = result_nfa.union(nfa)
         return result_nfa
+    def kleene_positive(self, nfa):
+        return nfa + nfa.kleene_star()
 
     def init_nfa(self):
         # Initialize the NFA used for the lexical analyzer
@@ -57,16 +59,16 @@ class LexicalAnalyzer:
         azAZ_ = [chr(i) for i in range(ord('a'), ord('z')+1)] + [chr(i) for i in range(ord('A'), ord('Z')+1)] + ['_']
         azAZ09_ = azAZ_ + [chr(i) for i in range(ord('0'), ord('9')+1)]
         all_except = [i for i in self.all_char if i not in azAZ09_]
-        double_operator_except = [chr(i) for i in range(0, 128) if chr(i) not in '=*/><']
-        triple_operator_except = [chr(i) for i in range(0, 128) if chr(i) not in '=']
         self.nfa.append(NFA.from_regex('|'.join(self.reservedWords))+self.range_nfa(all_except))
         # Identifiers
         self.nfa.append(self.range_nfa(azAZ_) + self.range_nfa(azAZ09_).kleene_star()+self.range_nfa(all_except))
         # Constants
         num = self.range_nfa([chr(i) for i in range(ord('0'), ord('9')+1)])
         num_except = self.range_nfa([i for i in self.all_char if i not in num])
-        self.nfa.append(num + num.kleene_star() + num_except)
+        self.nfa.append(self.kleene_positive(num) + num_except)
         # Operators
+        double_operator_except = [chr(i) for i in range(0, 128) if chr(i) not in '=*/><']
+        triple_operator_except = [chr(i) for i in range(0, 128) if chr(i) not in '=']
         self.nfa.append(
             self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '.']) + self.range_nfa(
                 double_operator_except))
@@ -79,12 +81,31 @@ class LexicalAnalyzer:
         # Separators
         self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';']))
         # Strings
-        self.nfa.append(self.range_nfa(['\'', '\"']) + self.range_nfa(all_except) + self.range_nfa(['\'', '\"'])) # incorrect!
+        single_line_except = [chr(i) for i in range(0, 128) if chr(i) not in "\n'"]
+        single_line_except.append("\\'")
+        double_line_except = [chr(i) for i in range(0, 128) if chr(i) not in '\n"']
+        double_line_except.append('\\"')
+        single_paragragh_except = [chr(i) for i in range(0, 128) if chr(i) not in "'"]
+        single_line_except.append("\\'")
+        double_paragragh_except = [chr(i) for i in range(0, 128) if chr(i) not in '"']
+        double_line_except.append('\\"')
+        self.nfa.append(
+            self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))
+        self.nfa.append(self.range_nfa(["\'\'"]) + self.range_nfa([chr(i) for i in range(0, 128) if chr(i) != '\'']))
+        self.nfa.append(
+            self.range_nfa(["\'\'\'"]) + self.range_nfa(single_paragragh_except).kleene_star() + self.range_nfa(
+                ["\'\'\'"]))
+
+        self.nfa.append(
+            self.range_nfa(['\"']) + self.kleene_positive(self.range_nfa(double_line_except)) + self.range_nfa(['\"']))
+        self.nfa.append(self.range_nfa(["\"\""]) + self.range_nfa([chr(i) for i in range(0, 128) if chr(i) != '\"']))
+        self.nfa.append(
+            self.range_nfa(["\"\"\""]) + self.range_nfa(double_paragragh_except).kleene_star() + self.range_nfa(
+                ["\"\"\""]))
         # Spaces
         self.nfa.append(self.range_nfa([' ', '\t', '\n']))
         # Comments
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([chr(i) for i in range(0, 128) if chr(i) != '\n']).kleene_star() + self.range_nfa(['\n']))
-
     def analyze(self, tokens) -> list[Token]:
         # Analyze the tokens and return a Tokenline
         token_list = []
@@ -94,7 +115,7 @@ class LexicalAnalyzer:
             for k,nfa in enumerate(self.nfa):
                 if nfa.accepts_input(token):
                     # Need to leave last character out if it's: reserved words, identifiers, constants, comments
-                    if k in [0,1,2,3,4,9]:
+                    if k in [0,1,2,3,4,8,11,14]:
                         i-=1
                         token = token[:-1]
                     # Generate token
@@ -102,8 +123,12 @@ class LexicalAnalyzer:
                         token_list.append(Token(token, TokenType(k)))
                     elif k in [3, 4, 5]:
                         token_list.append(Token(token, TokenType(3)))
-                    else:
+                    elif k == 6:
                         token_list.append(Token(token, TokenType(k - 2)))
+                    elif k in [7, 8, 9, 10, 11, 12]:
+                        token_list.append(Token(token, TokenType(5)))
+                    else:
+                        token_list.append(Token(token, TokenType(k-7)))
                     j=i
                     break
             i+=1
@@ -121,13 +146,13 @@ if __name__ == "__main__":
     '''with open("./test.py", "r", encoding='utf-8') as myfile:
         tokens = myfile.read()
         print(analyzer.analyze(tokens))'''
-    source = """def update_clue(guessed_letter, secret_word, clue):
+    source = """\"\"def update_clue(guessed_letter, secret_word, clue):
     index = 0
     # print(secret_word)
-    while index < len(secret_word):
+    \"while index < len(secret_word):\"
         if guessed_letter == != >> >= **= !== secret_word[index]:
             clue[index] = guessed_letter
-        index = index + 1 """
+        index = index + 112 \"\" """
     result = analyzer.analyze(source)
     for token in result:
         print(token)
