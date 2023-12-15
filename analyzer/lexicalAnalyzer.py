@@ -12,6 +12,7 @@ class TokenType(Enum):
     string = 5
     space = 6
     comment = 7
+    error = 8
 
 class Token:
     def __init__(self, token, tokenType):
@@ -20,7 +21,6 @@ class Token:
 
     def __str__(self):
         return "Token: "+self.token+" - Type: "+str(self.tokenType)
-    
     
 
 class LexicalAnalyzer:
@@ -109,6 +109,7 @@ class LexicalAnalyzer:
             i+=1
         if j < len(tokens):
             print("Warning: Unrecognized token from line: ", tokens if len(tokens) < 30 else tokens + "...", " at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:] + "...")
+            token_list.append(Token(tokens[j], TokenType.error))
             next_token = tokens[j+1:]
             token_list += self.analyze(next_token)
         # remove spaces for testing
