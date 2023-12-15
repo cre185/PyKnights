@@ -21,14 +21,6 @@ class Token:
     def __str__(self):
         return "Token: "+self.token+" - Type: "+str(self.tokenType)
     
-
-class TokenLine:
-    def __init__(self, token_list, valid):
-        self.token_list = token_list
-        self.valid = valid
-
-    def __str__(self):
-        return str(self.token_list)
     
 
 class LexicalAnalyzer:
@@ -83,7 +75,7 @@ class LexicalAnalyzer:
         # Comments
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([chr(i) for i in range(0, 128) if chr(i) != '\n']).kleene_star() + self.range_nfa(['\n']))
 
-    def analyze_line(self, tokens) -> TokenLine:
+    def analyze(self, tokens) -> list[Token]:
         # Analyze the tokens and return a Tokenline
         token_list = []
         i,j=1,0
@@ -101,18 +93,12 @@ class LexicalAnalyzer:
                     break
             i+=1
         if j < len(tokens):
-            print("Warning: Unrecognized token from: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:j+30] + "...")
-            return TokenLine(token_list, False)
+            print("Warning: Unrecognized token from line: ", tokens if len(tokens) < 30 else tokens + "...", " at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:] + "...")
+            next_token = tokens[j+1:]
+            token_list+=self.analyze(next_token)
         # remove spaces for testing
         # token_list = [token for token in token_list if not (token.tokenType == TokenType.space and token.token == " ")]
-        return TokenLine(token_list, True)
-    
-    def analyze(self, tokens) -> list[TokenLine]:
-        tokenline_list = []
-        lines = tokens.split("\n")
-        for line in lines:
-            tokenline_list.append(self.analyze_line(line+'\n'))
-        return tokenline_list
+        return token_list
 
 
 if __name__ == "__main__":
@@ -128,4 +114,5 @@ if __name__ == "__main__":
             clue[index] = guessed_letter
         index = index + 1 """
     result = analyzer.analyze(source)
-    print(result)
+    for token in result:
+        print(token)
