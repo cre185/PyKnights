@@ -57,6 +57,8 @@ class LexicalAnalyzer:
         azAZ_ = [chr(i) for i in range(ord('a'), ord('z')+1)] + [chr(i) for i in range(ord('A'), ord('Z')+1)] + ['_']
         azAZ09_ = azAZ_ + [chr(i) for i in range(ord('0'), ord('9')+1)]
         all_except = [i for i in self.all_char if i not in azAZ09_]
+        double_operator_except = [chr(i) for i in range(0, 128) if chr(i) not in '=*/><']
+        triple_operator_except = [chr(i) for i in range(0, 128) if chr(i) not in '=']
         self.nfa.append(NFA.from_regex('|'.join(self.reservedWords))+self.range_nfa(all_except))
         # Identifiers
         self.nfa.append(self.range_nfa(azAZ_) + self.range_nfa(azAZ09_).kleene_star()+self.range_nfa(all_except))
@@ -65,7 +67,15 @@ class LexicalAnalyzer:
         num_except = self.range_nfa([i for i in self.all_char if i not in num])
         self.nfa.append(num + num.kleene_star() + num_except)
         # Operators
-        self.nfa.append(self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '!', '&', '|', '^', '~', '.'])) # incorrect! can't treat ==
+        self.nfa.append(
+            self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '.']) + self.range_nfa(
+                double_operator_except))
+        self.nfa.append(
+            self.range_nfa(
+                ['+=', '-=', '*=', '/=', '%=', '==', '!=', '<=', '>=', '&=', '|=', '^=', '~=', '**', '//', '>>',
+                 '<<']) + self.range_nfa(
+                triple_operator_except))
+        self.nfa.append(self.range_nfa(['**=', '//=', '>>=', '<<=']))
         # Separators
         self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';']))
         # Strings
@@ -84,18 +94,23 @@ class LexicalAnalyzer:
             for k,nfa in enumerate(self.nfa):
                 if nfa.accepts_input(token):
                     # Need to leave last character out if it's: reserved words, identifiers, constants, comments
-                    if k in [0,1,2,7]:
+                    if k in [0,1,2,3,4,9]:
                         i-=1
                         token = token[:-1]
                     # Generate token
-                    token_list.append(Token(token, TokenType(k)))
+                    if k in [0, 1, 2]:
+                        token_list.append(Token(token, TokenType(k)))
+                    elif k in [3, 4, 5]:
+                        token_list.append(Token(token, TokenType(3)))
+                    else:
+                        token_list.append(Token(token, TokenType(k - 2)))
                     j=i
                     break
             i+=1
         if j < len(tokens):
             print("Warning: Unrecognized token from line: ", tokens if len(tokens) < 30 else tokens + "...", " at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:] + "...")
             next_token = tokens[j+1:]
-            token_list+=self.analyze(next_token)
+            token_list += self.analyze(next_token)
         # remove spaces for testing
         # token_list = [token for token in token_list if not (token.tokenType == TokenType.space and token.token == " ")]
         return token_list
@@ -110,7 +125,7 @@ if __name__ == "__main__":
     index = 0
     # print(secret_word)
     while index < len(secret_word):
-        if guessed_letter == secret_word[index]:
+        if guessed_letter == != >> >= **= !== secret_word[index]:
             clue[index] = guessed_letter
         index = index + 1 """
     result = analyzer.analyze(source)

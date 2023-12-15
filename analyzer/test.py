@@ -11,7 +11,6 @@ heart_symbol = u'\u2764'
 
 guessed_word_correctly = False
 
-
 def update_clue(guessed_letter, secret_word, clue):
     index = 0
     while index < len(secret_word):
