@@ -1,9 +1,7 @@
 import random
 
-# 生命次数
 lives = 3
 
-# 神秘单词, 随机选择
 words = ['pizza', 'fairy', 'teeth', 'shirt', 'otter', 'plane']
 secret_word = random.choice(words)
 # print(secret_word)
@@ -24,8 +22,8 @@ def update_clue(guessed_letter, secret_word, clue):
 
 while lives > 0:
     print(clue)
-    print('剩余生命次数: ' + heart_symbol * lives)
-    guess = input('猜测字母或者是整个单词: ')
+    print('lives remain: ' + heart_symbol * lives)
+    guess = input('guess a letter or the whole word: ')
 
     if guess == secret_word:
         guessed_word_correctly = True
@@ -34,7 +32,7 @@ while lives > 0:
     if guess in secret_word:
         update_clue(guess, secret_word, clue)
     else:
-        print('错误。你丢了一条命\n')
+        print('Error!\n')
         lives = lives - 1
 
 
