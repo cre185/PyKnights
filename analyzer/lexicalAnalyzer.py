@@ -48,8 +48,18 @@ class LexicalAnalyzer:
         )
         self.init_nfa()
 
-    def range_nfa(self, str_list):
+    def range_nfa(self, chr_list):
         # Generate an NFA for a range of characters
+        return NFA(
+            states={'s', 'f'},
+            input_symbols={ch for ch in self.all_char},
+            transitions={'s':{c:{'f'} for c in chr_list}, 'f':{}},
+            initial_state='s',
+            final_states={'f'}
+        )
+    
+    def range_str_nfa(self, str_list):
+        # Generate an NFA for a range of strings
         states = {'s'}
         transition = {'s':{'':set()}}
         final_states = set()
@@ -80,7 +90,7 @@ class LexicalAnalyzer:
         azAZ_ = [chr(i) for i in range(ord('a'), ord('z')+1)] + [chr(i) for i in range(ord('A'), ord('Z')+1)] + ['_']
         azAZ09_ = azAZ_ + [chr(i) for i in range(ord('0'), ord('9')+1)]
         all_except = [i for i in self.all_char if i not in azAZ09_]
-        self.nfa.append(self.range_nfa(self.reservedWords)+self.range_nfa(all_except))
+        self.nfa.append(self.range_str_nfa(self.reservedWords)+self.range_nfa(all_except))
         # Identifiers
         self.nfa.append(self.range_nfa(azAZ_) + self.range_nfa(azAZ09_).kleene_star()+self.range_nfa(all_except))
         # Constants
@@ -94,11 +104,11 @@ class LexicalAnalyzer:
             self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '.', '@']) + self.range_nfa(
                 double_operator_except))
         self.nfa.append(
-            self.range_nfa(
+            self.range_str_nfa(
                 ['+=', '-=', '*=', '/=', '%=', '==', '!=', '<=', '>=', '&=', '|=', '^=', '~=', '**', '//', '>>',
                  '<<', '->']) + self.range_nfa(
                 triple_operator_except))
-        self.nfa.append(self.range_nfa(['**=', '//=', '>>=', '<<=']))
+        self.nfa.append(self.range_str_nfa(['**=', '//=', '>>=', '<<=']))
         # Separators
         self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';']))
         # Strings
@@ -107,19 +117,13 @@ class LexicalAnalyzer:
         double_line_except = [i for i in self.all_char if i not in "\\\"\n"] + escape_character
         single_paragraph_except = [i for i in self.all_char if i not in "\\\'"] + escape_character
         double_paragraph_except = [i for i in self.all_char if i not in "\\\""] + escape_character
-        self.nfa.append(
-            self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))
-        self.nfa.append(self.range_nfa(["\'\'"]) + self.range_nfa([i for i in self.all_char if i != '\'']))
-        self.nfa.append(
-            self.range_nfa(["\'\'\'"]) + self.range_nfa(single_paragraph_except).kleene_star() + self.range_nfa(
-                ["\'\'\'"]))
+        self.nfa.append(self.range_nfa(['\'']) + self.kleene_positive(self.range_str_nfa(single_line_except)) + self.range_nfa(['\'']))
+        self.nfa.append(self.range_str_nfa(["\'\'"]) + self.range_nfa([i for i in self.all_char if i != '\'']))
+        self.nfa.append(self.range_str_nfa(["\'\'\'"]) + self.range_str_nfa(single_paragraph_except).kleene_star() + self.range_str_nfa(["\'\'\'"]))
 
-        self.nfa.append(
-            self.range_nfa(['\"']) + self.kleene_positive(self.range_nfa(double_line_except)) + self.range_nfa(['\"']))
-        self.nfa.append(self.range_nfa(["\"\""]) + self.range_nfa([i for i in self.all_char if i != '\"']))
-        self.nfa.append(
-            self.range_nfa(["\"\"\""]) + self.range_nfa(double_paragraph_except).kleene_star() + self.range_nfa(
-                ["\"\"\""]))
+        self.nfa.append(self.range_nfa(['\"']) + self.kleene_positive(self.range_str_nfa(double_line_except)) + self.range_nfa(['\"']))
+        self.nfa.append(self.range_str_nfa(["\"\""]) + self.range_nfa([i for i in self.all_char if i != '\"']))
+        self.nfa.append(self.range_str_nfa(["\"\"\""]) + self.range_str_nfa(double_paragraph_except).kleene_star() + self.range_str_nfa(["\"\"\""]))
         # Spaces
         space_except = [i for i in self.all_char if i not in " \t\n"]
         self.nfa.append(self.kleene_positive(self.range_nfa([' ', '\t', '\n']))+self.range_nfa(space_except))
