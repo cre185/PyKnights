@@ -34,7 +34,6 @@ while lives > 0:
         print('Error!\n')
         lives = lives - 1
 
-
 if guessed_word_correctly:
     print('You win! The secret word is ' + secret_word)
 else:

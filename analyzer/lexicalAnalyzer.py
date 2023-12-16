@@ -125,8 +125,8 @@ class LexicalAnalyzer:
 
         single_line_except = [i for i in self.all_char if i not in "\\\'\n"]
         double_line_except = [i for i in self.all_char if i not in "\\\"\n"]
-        single_paragraph_except = [i for i in self.all_char if i not in "\\\'"]
-        double_paragraph_except = [i for i in self.all_char if i not in "\\\""]
+        single_paragraph_except = [i for i in self.all_char if i not in "\\"]
+        double_paragraph_except = [i for i in self.all_char if i not in "\\"]
         self.nfa.append(self.range_nfa(['\'']) + self.kleene_positive(except_trans_nfa(single_line_except)) + self.range_nfa(['\'']))
         self.nfa.append(self.range_str_nfa(["\'\'"]) + self.range_nfa([i for i in self.all_char if i != '\'']))
         self.nfa.append(self.range_str_nfa(["\'\'\'"]) + except_trans_nfa(single_paragraph_except).kleene_star() + self.range_str_nfa(["\'\'\'"]))
@@ -188,7 +188,7 @@ class LexicalAnalyzer:
 
 if __name__ == "__main__":
     analyzer = LexicalAnalyzer()
-    with open(r"./test.py", "r", encoding='utf-8') as myfile:
+    with open(r"./test2.py", "r", encoding='utf-8') as myfile:
         tokens = myfile.read()
         # tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
         result = analyzer.analyze(tokens)
