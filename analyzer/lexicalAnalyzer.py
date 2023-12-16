@@ -38,7 +38,7 @@ class LexicalAnalyzer:
     def __init__(self):
         self.reservedWords = keyword.kwlist
         # Initialize some useful variables
-        self.all_char = [chr(i) for i in range(0, 128)] # definition for characters that can be accepted
+        self.all_char = [chr(i) for i in range(32, 128)] + [chr(10), chr(13), chr(9)] # definition for characters that can be accepted
         self.epsilon_nfa = NFA(
             states={'q0', 'q1'},
             input_symbols={i for i in self.all_char},
@@ -126,6 +126,10 @@ class LexicalAnalyzer:
         # Comments
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i != '\n']).kleene_star() + self.range_nfa(['\n']))
 
+        # Initialize states used for emulating the NFA
+        self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
+
+
     @time_count
     def analyze(self, tokens) -> list[Token]:
         result = self.analyze_tokens(tokens)
@@ -134,16 +138,16 @@ class LexicalAnalyzer:
     def analyze_tokens(self, tokens) -> list[Token]:
         # Analyze the tokens and return a Tokenline
         token_list = []
-        i,j=1,0
-        while i < len(tokens)+1:
-            token = tokens[j:i]
+        i,j=0,0
+        while i < len(tokens):
             for k,nfa in enumerate(self.nfa):
-                if nfa.accepts_input(token):
-                    # Need to leave last character out if it's: reserved words, identifiers, constants, comments
+                self.states[k] = nfa._get_next_current_states(self.states[k], tokens[i])
+                if not self.states[k].isdisjoint(nfa.final_states):
+                    # Need to leave last character out if it's: reserved words, identifiers, constants, spaces, comments
                     if k in [0,1,2,3,4,8,11,13,14]:
                         i-=1
-                        token = token[:-1]
                     # Generate token
+                    token = tokens[j:i+1]
                     if k in [0, 1, 2]:
                         token_list.append(Token(token, TokenType(k)))
                     elif k in [3, 4, 5]:
@@ -154,7 +158,9 @@ class LexicalAnalyzer:
                         token_list.append(Token(token, TokenType(5)))
                     else:
                         token_list.append(Token(token, TokenType(k-7)))
-                    j=i
+                    # Reset states
+                    j=i+1
+                    self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
                     break
             i+=1
         if j < len(tokens):
@@ -168,9 +174,9 @@ class LexicalAnalyzer:
 
 if __name__ == "__main__":
     analyzer = LexicalAnalyzer()
-    with open(r"./test.py", "r", encoding='utf-8') as myfile:
+    with open(r"./lexicalAnalyzer.py", "r", encoding='utf-8') as myfile:
         tokens = myfile.read()+"\x1A" # EOF
         # tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
         result = analyzer.analyze(tokens)
-        for token in result:
-            print(token)
+        '''for token in result:
+            print(token)'''
