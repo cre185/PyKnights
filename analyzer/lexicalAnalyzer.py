@@ -112,18 +112,28 @@ class LexicalAnalyzer:
         # Separators
         self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';']))
         # Strings
-        escape_character = ['\\' + i for i in self.all_char]
-        single_line_except = [i for i in self.all_char if i not in "\\\'\n"] + escape_character
-        double_line_except = [i for i in self.all_char if i not in "\\\"\n"] + escape_character
-        single_paragraph_except = [i for i in self.all_char if i not in "\\\'"] + escape_character
-        double_paragraph_except = [i for i in self.all_char if i not in "\\\""] + escape_character
-        self.nfa.append(self.range_nfa(['\'']) + self.kleene_positive(self.range_str_nfa(single_line_except)) + self.range_nfa(['\'']))
-        self.nfa.append(self.range_str_nfa(["\'\'"]) + self.range_nfa([i for i in self.all_char if i != '\'']))
-        self.nfa.append(self.range_str_nfa(["\'\'\'"]) + self.range_str_nfa(single_paragraph_except).kleene_star() + self.range_str_nfa(["\'\'\'"]))
+        def except_trans_nfa(uni_list):
+            transition = {'s':{c:{'nf'} for c in uni_list}, 'nf':{}, 't':{c:{'tf'} for c in self.all_char}, 'tf':{}}
+            transition['s']['\\'] = {'t'}
+            return NFA(
+                states={'s', 'nf', 't', 'tf'},
+                input_symbols={ch for ch in self.all_char},
+                transitions=transition,
+                initial_state='s',
+                final_states={'nf', 'tf'}
+            )
 
-        self.nfa.append(self.range_nfa(['\"']) + self.kleene_positive(self.range_str_nfa(double_line_except)) + self.range_nfa(['\"']))
+        single_line_except = [i for i in self.all_char if i not in "\\\'\n"]
+        double_line_except = [i for i in self.all_char if i not in "\\\"\n"]
+        single_paragraph_except = [i for i in self.all_char if i not in "\\\'"]
+        double_paragraph_except = [i for i in self.all_char if i not in "\\\""]
+        self.nfa.append(self.range_nfa(['\'']) + self.kleene_positive(except_trans_nfa(single_line_except)) + self.range_nfa(['\'']))
+        self.nfa.append(self.range_str_nfa(["\'\'"]) + self.range_nfa([i for i in self.all_char if i != '\'']))
+        self.nfa.append(self.range_str_nfa(["\'\'\'"]) + except_trans_nfa(single_paragraph_except).kleene_star() + self.range_str_nfa(["\'\'\'"]))
+
+        self.nfa.append(self.range_nfa(['\"']) + self.kleene_positive(except_trans_nfa(double_line_except)) + self.range_nfa(['\"']))
         self.nfa.append(self.range_str_nfa(["\"\""]) + self.range_nfa([i for i in self.all_char if i != '\"']))
-        self.nfa.append(self.range_str_nfa(["\"\"\""]) + self.range_str_nfa(double_paragraph_except).kleene_star() + self.range_str_nfa(["\"\"\""]))
+        self.nfa.append(self.range_str_nfa(["\"\"\""]) + except_trans_nfa(double_paragraph_except).kleene_star() + self.range_str_nfa(["\"\"\""]))
         # Spaces
         space_except = [i for i in self.all_char if i not in " \t\n"]
         self.nfa.append(self.kleene_positive(self.range_nfa([' ', '\t', '\n']))+self.range_nfa(space_except))
@@ -136,7 +146,7 @@ class LexicalAnalyzer:
 
     @time_count
     def analyze(self, tokens) -> list[Token]:
-        result = self.analyze_tokens(tokens)
+        result = self.analyze_tokens(tokens+"\x1A") # EOF
         return result[:-1] if len(result) > 0 and result[-1].tokenType == TokenType.error else result
 
     def analyze_tokens(self, tokens) -> list[Token]:
@@ -178,8 +188,8 @@ class LexicalAnalyzer:
 
 if __name__ == "__main__":
     analyzer = LexicalAnalyzer()
-    with open(r"./lexicalAnalyzer.py", "r", encoding='utf-8') as myfile:
-        tokens = myfile.read()+"\x1A" # EOF
+    with open(r"./test.py", "r", encoding='utf-8') as myfile:
+        tokens = myfile.read()
         # tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
         result = analyzer.analyze(tokens)
         '''for token in result:
