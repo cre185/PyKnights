@@ -1,3 +1,4 @@
+from functools import wraps
 import keyword
 import time # for reserved words
 from automata.fa.nfa import NFA # for automata
@@ -23,6 +24,15 @@ class Token:
     def __str__(self):
         return "Token: "+self.token+" - Type: "+str(self.tokenType)
     
+
+def time_count(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        print("Time spent in "+func.__name__+": ", time.time()-start_time)
+        return result
+    return wrapper
+
 
 class LexicalAnalyzer:
     def __init__(self):
@@ -62,8 +72,8 @@ class LexicalAnalyzer:
     def kleene_positive(self, nfa):
         return nfa + nfa.kleene_star()
 
+    @time_count
     def init_nfa(self):
-        start_time = time.time()
         # Initialize the NFA used for the lexical analyzer
         self.nfa = []
         # Reserved words
@@ -115,10 +125,13 @@ class LexicalAnalyzer:
         self.nfa.append(self.kleene_positive(self.range_nfa([' ', '\t', '\n']))+self.range_nfa(space_except))
         # Comments
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i != '\n']).kleene_star() + self.range_nfa(['\n']))
-        print("NFA initialization time: ", time.time()-start_time)
 
+    @time_count
     def analyze(self, tokens) -> list[Token]:
-        time_start = time.time()
+        result = self.analyze_tokens(tokens)
+        return result[:-1] if len(result) > 0 and result[-1].tokenType == TokenType.error else result
+
+    def analyze_tokens(self, tokens) -> list[Token]:
         # Analyze the tokens and return a Tokenline
         token_list = []
         i,j=1,0
@@ -147,19 +160,17 @@ class LexicalAnalyzer:
         if j < len(tokens):
             print("Warning: Unrecognized token at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:] + "...")
             token_list.append(Token(tokens[j], TokenType.error))
-            next_token = tokens[j+1:]
-            token_list += self.analyze(next_token)
+            token_list += self.analyze_tokens(tokens[j+1:])
         # remove spaces for testing
         # token_list = [token for token in token_list if not (token.tokenType == TokenType.space and token.token == " ")]
-        print("Lexical analysis time: ", time.time()-time_start)
         return token_list
 
 
 if __name__ == "__main__":
     analyzer = LexicalAnalyzer()
     with open(r"./test.py", "r", encoding='utf-8') as myfile:
-        # tokens = myfile.read()
-        tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
+        tokens = myfile.read()+"\x1A" # EOF
+        # tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
         result = analyzer.analyze(tokens)
         for token in result:
             print(token)
