@@ -91,34 +91,34 @@ class LexicalAnalyzer:
         double_operator_except = [i for i in self.all_char if i not in '=*/><']
         triple_operator_except = [i for i in self.all_char if i not in '=']
         self.nfa.append(
-            self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '.']) + self.range_nfa(
+            self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '.', '@']) + self.range_nfa(
                 double_operator_except))
         self.nfa.append(
             self.range_nfa(
                 ['+=', '-=', '*=', '/=', '%=', '==', '!=', '<=', '>=', '&=', '|=', '^=', '~=', '**', '//', '>>',
-                 '<<']) + self.range_nfa(
+                 '<<', '->']) + self.range_nfa(
                 triple_operator_except))
         self.nfa.append(self.range_nfa(['**=', '//=', '>>=', '<<=']))
         # Separators
         self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';']))
         # Strings
-        single_line_except = [i for i in self.all_char if i not in "\n"]
-        double_line_except = [i for i in self.all_char if i not in '\n"']
-        double_line_except.append('\\"')
-        double_paragragh_except = [i for i in self.all_char if i not in '"']
-        double_line_except.append('\\"')
+        escape_character = ['\\' + i for i in self.all_char]
+        single_line_except = [i for i in self.all_char if i not in "\\\'\n"] + escape_character
+        double_line_except = [i for i in self.all_char if i not in "\\\"\n"] + escape_character
+        single_paragraph_except = [i for i in self.all_char if i not in "\\\'"] + escape_character
+        double_paragraph_except = [i for i in self.all_char if i not in "\\\""] + escape_character
         self.nfa.append(
-            self.range_nfa(['\'']) + self.range_nfa(single_line_except).kleene_star() + self.range_nfa([i for i in single_line_except if i not in "\\"]) + self.range_nfa(['\'']))
+            self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))
         self.nfa.append(self.range_nfa(["\'\'"]) + self.range_nfa([i for i in self.all_char if i != '\'']))
         self.nfa.append(
-            self.range_nfa(["\'\'\'"]) +(self.range_nfa(self.all_char).kleene_star()+self.range_nfa([i for i in self.all_char if i not in "\\"])).union(self.epsilon_nfa)+ self.range_nfa(
+            self.range_nfa(["\'\'\'"]) + self.range_nfa(single_paragraph_except).kleene_star() + self.range_nfa(
                 ["\'\'\'"]))
 
         self.nfa.append(
-            self.range_nfa(['\"']) + self.range_nfa(double_line_except).kleene_star() + self.range_nfa([i for i in single_line_except if i not in "\\"]) + self.range_nfa(['\"']))
+            self.range_nfa(['\"']) + self.kleene_positive(self.range_nfa(double_line_except)) + self.range_nfa(['\"']))
         self.nfa.append(self.range_nfa(["\"\""]) + self.range_nfa([i for i in self.all_char if i != '\"']))
         self.nfa.append(
-            self.range_nfa(["\"\"\""]) + self.range_nfa(double_paragragh_except).kleene_star() + self.range_nfa(
+            self.range_nfa(["\"\"\""]) + self.range_nfa(double_paragraph_except).kleene_star() + self.range_nfa(
                 ["\"\"\""]))
         # Spaces
         space_except = [i for i in self.all_char if i not in " \t\n"]
