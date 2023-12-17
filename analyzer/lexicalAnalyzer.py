@@ -181,7 +181,7 @@ class LexicalAnalyzer:
             if not flag:
                 break
             i+=1
-        if j < len(tokens):
+        if j < len(tokens) and not tokens[j:]==chr(127):
             print("Warning: Unrecognized token at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:j+30] + "...")
             token_list.append(Token(tokens[j], TokenType.error))
             token_list += self.analyze_tokens(tokens[j+1:])
