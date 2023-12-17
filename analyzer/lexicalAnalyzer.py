@@ -1,4 +1,3 @@
-from functools import wraps
 import keyword
 import time # for reserved words
 from automata.fa.nfa import NFA # for automata
@@ -154,8 +153,11 @@ class LexicalAnalyzer:
         token_list = []
         i,j=0,0
         while i < len(tokens):
+            flag = False
             for k,nfa in enumerate(self.nfa):
                 self.states[k] = nfa._get_next_current_states(self.states[k], tokens[i])
+                if len(self.states[k]) != 0:
+                    flag = True
                 if not self.states[k].isdisjoint(nfa.final_states):
                     # Need to leave last character out if it's: reserved words, identifiers, constants, spaces, comments
                     if k in [0,1,2,3,4,8,11,13,14]:
@@ -176,6 +178,9 @@ class LexicalAnalyzer:
                     j=i+1
                     self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
                     break
+            if not flag:
+                self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
+                break
             i+=1
         if j < len(tokens):
             print("Warning: Unrecognized token at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:] + "...")
@@ -188,9 +193,9 @@ class LexicalAnalyzer:
 
 if __name__ == "__main__":
     analyzer = LexicalAnalyzer()
-    with open(r"./test2.py", "r", encoding='utf-8') as myfile:
+    with open(r"./test.py", "r", encoding='utf-8') as myfile:
         tokens = myfile.read()
         # tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
         result = analyzer.analyze(tokens)
-        '''for token in result:
-            print(token)'''
+        for token in result:
+            print(token)

@@ -69,7 +69,6 @@ from typing_extensions import (
 
 if sys.version_info >= (3, 9):
     from types import GenericAlias
-
 _T = TypeVar("_T")
 _T_co = TypeVar("_T_co", covariant=True)
 _T_contra = TypeVar("_T_contra", contravariant=True)
