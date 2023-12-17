@@ -1,4 +1,4 @@
-我import random
+import random
 
 lives = 3
 
@@ -10,24 +10,13 @@ clue = list('?????')
 heart_symbol = u'\u2764'
 
 guessed_word_correctly = False
-'''hehaiavbiabaoi \
-diadiaviVCUI \
-cBIBVvVOBO'''
+
 def update_clue(guessed_letter, secret_word, clue):
     index = 0
     while index < len(secret_word):
         if guessed_letter == secret_word[index]:
             clue[index] = guessed_letter
         index = index + 1
-a=1
-b=2
-c=3
-if a==1\
-    and b==2\
-    and c==3:
-    ea=2
-
-
 
 while lives > 0:
     print(clue)
@@ -48,4 +37,3 @@ if guessed_word_correctly:
     print('You win! The secret word is ' + secret_word)
 else:
     print('You lose! The secret word is ' + secret_word)
-

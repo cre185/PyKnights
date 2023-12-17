@@ -1,3 +1,4 @@
+import argparse
 import keyword
 import time # for reserved words
 from automata.fa.nfa import NFA # for automata
@@ -28,7 +29,7 @@ def time_count(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)
-        print("Time spent in "+func.__name__+": ", time.time()-start_time)
+        # print("Time spent in "+func.__name__+": ", time.time()-start_time)
         return result
     return wrapper
 
@@ -140,8 +141,6 @@ class LexicalAnalyzer:
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i != '\n']).kleene_star() + self.range_nfa(['\n']))
 
 
-
-
     @time_count
     def analyze(self, tokens) -> list[Token]:
         result = self.analyze_tokens(tokens+chr(127))
@@ -192,10 +191,13 @@ class LexicalAnalyzer:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Lexical Analyzer.')
+    parser.add_argument('-f', '--file', help='Input file name')
+    args = parser.parse_args()
+
     analyzer = LexicalAnalyzer()
-    with open(r"./test.py", "r", encoding='utf-8') as myfile:
+    with open(r"./test.py" if not args.file else args.file, "r", encoding='utf-8') as myfile:
         tokens = myfile.read()
-        # tokens = r"self.range_nfa(['\'']) + self.kleene_positive(self.range_nfa(single_line_except)) + self.range_nfa(['\'']))"
         result = analyzer.analyze(tokens)
         for token in result:
             print(token)
