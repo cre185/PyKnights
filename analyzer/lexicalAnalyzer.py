@@ -109,7 +109,7 @@ class LexicalAnalyzer:
                 triple_operator_except))
         self.nfa.append(self.range_str_nfa(['**=', '//=', '>>=', '<<=']))
         # Separators
-        self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';']))
+        self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';', '\\']))
         # Strings
         def except_trans_nfa(uni_list):
             transition = {'s':{c:{'nf'} for c in uni_list}, 'nf':{}, 't':{c:{'tf'} for c in self.all_char}, 'tf':{}}
@@ -139,8 +139,7 @@ class LexicalAnalyzer:
         # Comments
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i != '\n']).kleene_star() + self.range_nfa(['\n']))
 
-        # Initialize states used for emulating the NFA
-        self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
+
 
 
     @time_count
@@ -149,6 +148,8 @@ class LexicalAnalyzer:
         return result[:-1] if len(result) > 0 and result[-1].tokenType == TokenType.error else result
 
     def analyze_tokens(self, tokens) -> list[Token]:
+        # Initialize states used for emulating the NFA
+        self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
         # Analyze the tokens and return a Tokenline
         token_list = []
         i,j=0,0
@@ -179,11 +180,10 @@ class LexicalAnalyzer:
                     self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
                     break
             if not flag:
-                self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]
                 break
             i+=1
         if j < len(tokens):
-            print("Warning: Unrecognized token at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:] + "...")
+            print("Warning: Unrecognized token at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:j+30] + "...")
             token_list.append(Token(tokens[j], TokenType.error))
             token_list += self.analyze_tokens(tokens[j+1:])
         # remove spaces for testing

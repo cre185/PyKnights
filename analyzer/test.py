@@ -1,4 +1,4 @@
-import random
+我import random
 
 lives = 3
 
@@ -19,6 +19,14 @@ def update_clue(guessed_letter, secret_word, clue):
         if guessed_letter == secret_word[index]:
             clue[index] = guessed_letter
         index = index + 1
+a=1
+b=2
+c=3
+if a==1\
+    and b==2\
+    and c==3:
+    ea=2
+
 
 
 while lives > 0:
