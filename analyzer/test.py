@@ -48,3 +48,4 @@ if guessed_word_correctly:
     print('You win! The secret word is ' + secret_word)
 else:
     print('You lose! The secret word is ' + secret_word)
+

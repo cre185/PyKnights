@@ -144,7 +144,7 @@ class LexicalAnalyzer:
 
     @time_count
     def analyze(self, tokens) -> list[Token]:
-        result = self.analyze_tokens(tokens+"\x1A") # EOF
+        result = self.analyze_tokens(tokens+chr(127))
         return result[:-1] if len(result) > 0 and result[-1].tokenType == TokenType.error else result
 
     def analyze_tokens(self, tokens) -> list[Token]:
