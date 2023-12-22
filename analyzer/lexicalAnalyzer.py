@@ -1,8 +1,7 @@
-import argparse
 import keyword
-import time # for reserved words
-from automata.fa.nfa import NFA # for automata
+from automata.fa.nfa import NFA
 from enum import Enum
+from errorHandler import *
 
 class TokenType(Enum):
     # Enumerate the token types
@@ -23,22 +22,13 @@ class Token:
 
     def __str__(self):
         return "Token: "+self.token+" - Type: "+str(self.tokenType)
-    
-
-def time_count(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        # print("Time spent in "+func.__name__+": ", time.time()-start_time)
-        return result
-    return wrapper
-
 
 class LexicalAnalyzer:
-    def __init__(self):
+    def __init__(self, errorHandler):
         self.reservedWords = keyword.kwlist
+        self.errorHandler = errorHandler
         # Initialize some useful variables
-        self.all_char = [chr(i) for i in range(32, 128)] + [chr(10), chr(13), chr(9)] # definition for characters that can be accepted
+        self.all_char = ['\0'] + [chr(i) for i in range(32, 128)] + [chr(10), chr(13), chr(9)] # definition for characters that can be accepted
         self.epsilon_nfa = NFA(
             states={'q0', 'q1'},
             input_symbols={i for i in self.all_char},
@@ -82,7 +72,7 @@ class LexicalAnalyzer:
     def kleene_positive(self, nfa):
         return nfa + nfa.kleene_star()
 
-    @time_count
+    # @time_count
     def init_nfa(self):
         # Initialize the NFA used for the lexical analyzer
         self.nfa = []
@@ -138,12 +128,12 @@ class LexicalAnalyzer:
         space_except = [i for i in self.all_char if i not in " \t\n"]
         self.nfa.append(self.kleene_positive(self.range_nfa([' ', '\t', '\n']))+self.range_nfa(space_except))
         # Comments
-        self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i != '\n']).kleene_star() + self.range_nfa(['\n']))
+        self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i not in ['\n']]).kleene_star() + self.range_nfa(['\n', '\0']))
 
 
     @time_count
     def analyze(self, tokens) -> list[Token]:
-        result = self.analyze_tokens(tokens+chr(127))
+        result = self.analyze_tokens(tokens+'\0')
         return result[:-1] if len(result) > 0 and result[-1].tokenType == TokenType.error else result
 
     def analyze_tokens(self, tokens) -> list[Token]:
@@ -181,23 +171,8 @@ class LexicalAnalyzer:
             if not flag:
                 break
             i+=1
-        if j < len(tokens) and not tokens[j:]==chr(127):
-            print("Warning: Unrecognized token at: ", tokens[j:] if len(tokens[j:]) < 30 else tokens[j:j+30] + "...")
+        if j < len(tokens) and not tokens[j:]=='\0':
+            self.errorHandler.addError(ErrorType.lexicalError, "Unrecognized token at: "+tokens[j:] if len(tokens[j:]) < 30 else tokens[j:j+30]+"...")
             token_list.append(Token(tokens[j], TokenType.error))
             token_list += self.analyze_tokens(tokens[j+1:])
-        # remove spaces for testing
-        # token_list = [token for token in token_list if not (token.tokenType == TokenType.space and token.token == " ")]
         return token_list
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Lexical Analyzer.')
-    parser.add_argument('-f', '--file', help='Input file name')
-    args = parser.parse_args()
-
-    analyzer = LexicalAnalyzer()
-    with open(r"./test.py" if not args.file else args.file, "r", encoding='utf-8') as myfile:
-        tokens = myfile.read()
-        result = analyzer.analyze(tokens)
-        for token in result:
-            print(token)
