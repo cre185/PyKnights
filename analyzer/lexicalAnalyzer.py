@@ -1,27 +1,7 @@
 import keyword
+from errorHandler import ErrorType
+from utils import *
 from automata.fa.nfa import NFA
-from enum import Enum
-from errorHandler import *
-
-class TokenType(Enum):
-    # Enumerate the token types
-    reserved = 0
-    identifier = 1
-    constant = 2
-    operator = 3
-    separator = 4
-    string = 5
-    space = 6
-    comment = 7
-    error = 8
-
-class Token:
-    def __init__(self, token, tokenType):
-        self.token = token
-        self.tokenType = tokenType
-
-    def __str__(self):
-        return "Token: "+self.token+" - Type: "+str(self.tokenType)
 
 class LexicalAnalyzer:
     def __init__(self, errorHandler):
@@ -131,7 +111,7 @@ class LexicalAnalyzer:
         self.nfa.append(self.range_nfa(['#']) + self.range_nfa([i for i in self.all_char if i not in ['\n']]).kleene_star() + self.range_nfa(['\n', '\0']))
 
 
-    @time_count
+    # @time_count
     def analyze(self, tokens) -> list[Token]:
         result = self.analyze_tokens(tokens+'\0')
         return result[:-1] if len(result) > 0 and result[-1].tokenType == TokenType.error else result
@@ -159,11 +139,14 @@ class LexicalAnalyzer:
                     elif k in [3, 4, 5]:
                         token_list.append(Token(token, TokenType(3)))
                     elif k == 6:
-                        token_list.append(Token(token, TokenType(k - 2)))
+                        token_list.append(Token(token, TokenType(4)))
                     elif k in [7, 8, 9, 10, 11, 12]:
                         token_list.append(Token(token, TokenType(5)))
-                    else:
-                        token_list.append(Token(token, TokenType(k-7)))
+                    elif k == 13:
+                        if '\n' in token:
+                            token_list.append(Token(token, TokenType(6)))
+                    elif k == 14:
+                        token_list.append(Token(token, TokenType(7)))
                     # Reset states
                     j=i+1
                     self.states = [nfa._get_lambda_closures()[nfa.initial_state] for nfa in self.nfa]

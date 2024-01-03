@@ -11,10 +11,15 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--file', help='Input file name')
     args = parser.parse_args()
 
-    analyzer = LexicalAnalyzer(errorHandler)
+    LA = LexicalAnalyzer(errorHandler)
+    SA = SyntaxAnalyzer(errorHandler)
     with open(r"./test.py" if not args.file else args.file, "r", encoding='utf-8') as myfile:
         script = myfile.read()
-        tokens = analyzer.analyze(script)
+        tokens = LA.analyze(script)
         errorHandler.handleError()
         errorHandler.clear()
         print('lexical analysis finished')
+        ast = SA.analyze(tokens)
+        errorHandler.handleError()
+        errorHandler.clear()
+        print('syntax analysis finished')

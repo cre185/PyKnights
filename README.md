@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ### 运行  
 在analyzer目录下直接运行  
 ```bash
-python lexicalAnalyzer.py  
+python main.py  
 ```
 脚本带有命令行参数功能 可以通过添加`-h`参数查看帮助  
 目前仅包含一个可选参数`-f` 后跟文件路径表示待分析的文件路径   
