@@ -28,7 +28,13 @@ class Token:
         self.tokenType = tokenType
 
     def __str__(self):
-        return "Token: "+self.token+" - Type: "+str(self.tokenType)
+        return "Token: "+str(self.token)+" - Type: "+str(self.tokenType)
+    
+
+class Signal(Enum):
+    S = 0
+    epsilon = 1
+    line = 2
     
 
 class ErrorType(Enum):

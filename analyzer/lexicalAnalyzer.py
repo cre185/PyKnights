@@ -143,8 +143,7 @@ class LexicalAnalyzer:
                     elif k in [7, 8, 9, 10, 11, 12]:
                         token_list.append(Token(token, TokenType(5)))
                     elif k == 13:
-                        if '\n' in token:
-                            token_list.append(Token(token, TokenType(6)))
+                        token_list.append(Token(token, TokenType(6)))
                     elif k == 14:
                         token_list.append(Token(token, TokenType(7)))
                     # Reset states
