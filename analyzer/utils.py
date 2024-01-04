@@ -30,11 +30,18 @@ class Token:
     def __str__(self):
         return "Token: "+str(self.token)+" - Type: "+str(self.tokenType)
     
+'''
+Signals are used in transition list
 
+'''
 class Signal(Enum):
     S = 0
-    epsilon = 1
     line = 2
+    readable = 3
+    list_part = 4
+    readable_after_identifier = 5
+    identifier_list_part = 6
+    align_end = 7
     
 
 class ErrorType(Enum):
