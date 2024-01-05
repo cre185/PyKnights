@@ -192,7 +192,7 @@ class SyntaxAnalyzer:
         standard_space=4
         if len(tokens)!=0 and tokens[-1].tokenType != TokenType.space:
             tokens.append(Token('\n', TokenType.space))
-        elif tokens[-1].tokenType == TokenType.space:
+        elif len(tokens)!=0 and tokens[-1].tokenType == TokenType.space:
             tokens[-1].token = '\n'
         while i < len(tokens):
             if tokens[i].tokenType == TokenType.space:
@@ -241,16 +241,10 @@ class SyntaxAnalyzer:
         while len(stack) != 0 and i < len(tokens):
             top = stack.pop()
             if isinstance(top, Token):
-                if tokens[i].tokenType == top.tokenType:
-                    if tokens[i].tokenType == TokenType.space or tokens[i].tokenType == TokenType.reserved or tokens[i].tokenType == TokenType.separator:
-                        if tokens[i].token == top.token:
-                            tree.create_node(tag=tokens[i].token, identifier=top.token+str(token_count), parent=stack_for_tree.pop())
-                            token_count+=1
-                            i+=1
-                    else:
-                        tree.create_node(tag=tokens[i].token, identifier=top.token+str(token_count), parent=stack_for_tree.pop())
-                        token_count+=1
-                        i+=1
+                if tokens[i].tokenType == top.tokenType and (top.token == '' or top.token == tokens[i].token):
+                    tree.create_node(tag=tokens[i].token, identifier=top.token+str(token_count), parent=stack_for_tree.pop())
+                    token_count+=1
+                    i+=1
                 else:
                     self.errorHandler.addError(ErrorType.syntaxError, 'Syntax Error: Unexpected token ' + str(tokens[i]))
                     i+=1
