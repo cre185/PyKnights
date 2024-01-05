@@ -23,4 +23,6 @@ if __name__ == "__main__":
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
-        parse_tree.to_graphviz('tree.dot')
+        with open('tree.json', 'w') as outfile:
+            result = parse_tree.to_json()
+            outfile.write(result)
