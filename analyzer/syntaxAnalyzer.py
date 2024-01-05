@@ -250,6 +250,7 @@ class SyntaxAnalyzer:
                         i+=1
                 else:
                     self.errorHandler.addError(ErrorType.syntaxError, 'Syntax Error: Unexpected token ' + str(tokens[i]))
+                    i+=1
             else: # a non-terminal
                 table_entry = self.table(top, tokens[i])
                 if table_entry == -1:
