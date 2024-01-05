@@ -61,6 +61,7 @@ class SyntaxAnalyzer:
             (Signal.identifier_list, []),
             (Signal.import_goods, [Token('', TokenType.identifier), Signal.identifier_list_part]),
             (Signal.import_goods, [Token('*', TokenType.operator)]), # 50
+            (Signal.line, [Signal.readable]),
         ]
 
     def table(self, non_terminal, token):
@@ -100,8 +101,10 @@ class SyntaxAnalyzer:
                     return 14
                 elif token.tokenType == TokenType.reserved and token.token == 'class':
                     return 15
-                else:
+                elif token.tokenType == TokenType.identifier:
                     return 16
+                else:
+                    return 51
             case Signal.inherit:
                 if token.tokenType == TokenType.separator and token.token == '(':
                     return 17
