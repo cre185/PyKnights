@@ -64,14 +64,17 @@ class LexicalAnalyzer:
         # Identifiers
         self.nfa.append(self.range_nfa(azAZ_) + self.range_nfa(azAZ09_).kleene_star()+self.range_nfa(all_except))
         # Constants
-        num = self.range_nfa([chr(i) for i in range(ord('0'), ord('9')+1)])
-        num_except = self.range_nfa([i for i in self.all_char if i not in num])
+        num_list = [chr(i) for i in range(ord('0'), ord('9')+1)]
+        num = self.range_nfa(num_list)
+        num_except = self.range_nfa([i for i in self.all_char if i not in num_list and i != '.'])
+        num_end = self.range_nfa([i for i in self.all_char if i not in num_list])
         self.nfa.append(self.kleene_positive(num) + num_except)
-        # Operators
+        self.nfa.append(self.kleene_positive(num) + self.range_nfa('.') + num.kleene_star() + num_end)
+        # Operators and assigners
         double_operator_except = [i for i in self.all_char if i not in '=*/><']
         triple_operator_except = [i for i in self.all_char if i not in '=']
         self.nfa.append(
-            self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '.', '@']) + self.range_nfa(
+            self.range_nfa(['+', '-', '*', '/', '%', '=', '<', '>', '&', '|', '^', '~', '@']) + self.range_nfa(
                 double_operator_except))
         self.nfa.append(
             self.range_str_nfa(
@@ -80,7 +83,7 @@ class LexicalAnalyzer:
                 triple_operator_except))
         self.nfa.append(self.range_str_nfa(['**=', '//=', '>>=', '<<=']))
         # Separators
-        self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', ',', ':', ';', '\\']))
+        self.nfa.append(self.range_nfa(['(', ')', '[', ']', '{', '}', '.', ',', ':', ';', '\\']))
         # Strings
         def except_trans_nfa(uni_list):
             transition = {'s':{c:{'nf'} for c in uni_list}, 'nf':{}, 't':{c:{'tf'} for c in self.all_char}, 'tf':{}}
@@ -130,21 +133,26 @@ class LexicalAnalyzer:
                     flag = True
                 if not self.states[k].isdisjoint(nfa.final_states):
                     # Need to leave last character out if it's: reserved words, identifiers, constants, spaces, comments
-                    if k in [0,1,2,3,4,8,11,13,14]:
+                    if k in [0,1,2,3,4,5,9,12,14,15]:
                         i-=1
                     # Generate token
                     token = tokens[j:i+1]
-                    if k in [0, 1, 2]:
+                    if k in [0, 1]:
                         token_list.append(Token(token, TokenType(k)))
-                    elif k in [3, 4, 5]:
-                        token_list.append(Token(token, TokenType(3)))
-                    elif k == 6:
+                    elif k in [2, 3]:
+                        token_list.append(Token(token, TokenType(2)))
+                    elif k in [4, 5, 6]:
+                        if token[-1]=='=' and token!='==': # Then it's an assigner
+                            token_list.append(Token(token, TokenType(9)))
+                        else:
+                            token_list.append(Token(token, TokenType(3)))
+                    elif k == 7:
                         token_list.append(Token(token, TokenType(4)))
-                    elif k in [7, 8, 9, 10, 11, 12]:
+                    elif k in [8, 9, 10, 11, 12, 13]:
                         token_list.append(Token(token, TokenType(5)))
-                    elif k == 13:
-                        token_list.append(Token(token, TokenType(6)))
                     elif k == 14:
+                        token_list.append(Token(token, TokenType(6)))
+                    elif k == 15:
                         token_list.append(Token(token, TokenType(7)))
                     # Reset states
                     j=i+1

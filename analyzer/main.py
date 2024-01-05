@@ -23,4 +23,4 @@ if __name__ == "__main__":
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
-        # ast.show()
+        ast.to_graphviz('tree.dot')

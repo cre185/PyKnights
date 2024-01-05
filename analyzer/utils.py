@@ -21,6 +21,7 @@ class TokenType(Enum):
     space = 6
     comment = 7
     error = 8
+    assigner = 9
 
 class Token:
     def __init__(self, token, tokenType):
@@ -32,16 +33,32 @@ class Token:
     
 '''
 Signals are used in transition list
-
+S: start signal, representing the whole program, can be split into lines
+line: representing a line, have a bunch of complex possible representations
+readable: representing a readable, it must at least provide a value that can be assigned to a mutable
+readable_list: representing a list of readables
+readable_list_part: representing a part of a list consisting of readables
+identifier_list: representing a list of identifiers
+identifier_list_part: representing a part of a list consisting of identifiers
+align_end: treating the possible end of an indent block, so it can be aligned with the start of the block
+after_identifier: representing what a line can appear after accepting an identifier
+readable_after_identifier: representing what a readable can appear after accepting an identifier
+inherit: representing the inheritance of a class
+import_goods: representing things that can be imported
 '''
 class Signal(Enum):
     S = 0
-    line = 2
-    readable = 3
-    list_part = 4
-    readable_after_identifier = 5
+    line = 1
+    readable = 2
+    readable_list = 3
+    readable_list_part = 4
+    identifier_list = 5
     identifier_list_part = 6
     align_end = 7
+    after_identifier = 8
+    readable_after_identifier = 9
+    inherit = 10
+    import_goods = 11
     
 
 class ErrorType(Enum):

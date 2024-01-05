@@ -1,4 +1,29 @@
 import random
+from utils import time_count
+from main import *
+
+class MyDFA:
+    def __init__(self, properties):
+        self.properties = properties
+        self.tag = 'MyDFA'
+        self.notice = 'This is a test'
+
+    def just_a_test(self):
+        print('This is just a test')
+        print('If you don\'t trust me, see: ' + self.notice)
+        return self.tag
+
+def an_outer_test():
+    print('This is an outer test')
+
+an_outer_test()
+
+aDFA = MyDFA('This is a DFA')
+aDFA.just_a_test()
+
+string_list = ['a', 'b', 'deaf\'s asdaw', '''
+    This is a test''']
+number_list = [1, 114514, 234.567, -18.290, 0003.40, 1.]
 
 lives = 3
 
@@ -32,8 +57,3 @@ while lives > 0:
     else:
         print('Error!\n')
         lives = lives - 1
-
-if guessed_word_correctly:
-    print('You win! The secret word is ' + secret_word)
-else:
-    print('You lose! The secret word is ' + secret_word)
