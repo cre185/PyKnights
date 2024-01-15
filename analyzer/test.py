@@ -23,7 +23,7 @@ aDFA.just_a_test()
 
 string_list = ['a', 'b', 'deaf\'s asdaw', '''
     This is a test''']
-number_list = [1, 114514, 234.567, -18.290, 0003.40, 1.]
+number_list = [1, 114514, 234.567, -18.290, 0003.40, 1., 0xAa0, 1 + 8.3j, 9.6e4, 8.e6]
 
 lives = 3
 
