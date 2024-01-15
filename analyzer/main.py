@@ -27,11 +27,11 @@ if __name__ == "__main__":
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
-        if args.dot:
+        '''if args.dot:
             parse_tree.to_graphviz('tree.dot')
         with open('tree.json', 'w') as outfile:
             result = parse_tree.to_json()
-            outfile.write(result)
+            outfile.write(result)'''
         SE.analyze(parse_tree)
         print('semantic analysis finished')
         errorHandler.handleError()
