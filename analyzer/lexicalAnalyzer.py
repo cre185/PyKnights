@@ -1,7 +1,7 @@
 import keyword
-from errorHandler import ErrorType
 from utils import *
 from automata.fa.nfa import NFA
+from symbolTable import *
 
 class LexicalAnalyzer:
     def __init__(self, errorHandler):
@@ -137,8 +137,11 @@ class LexicalAnalyzer:
                         i-=1
                     # Generate token
                     token = tokens[j:i+1]
-                    if k in [0, 1]:
-                        token_list.append(Token(token, TokenType(k)))
+                    if k == 0:
+                        token_list.append(Token(token, TokenType(0)))
+                    elif k == 1:
+                        symbolTable[token] = symbolProp(SymbolType.variable)
+                        token_list.append(Token(token, TokenType(1)))
                     elif k in [2, 3]:
                         token_list.append(Token(token, TokenType(2)))
                     elif k in [4, 5, 6]:

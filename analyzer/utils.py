@@ -67,3 +67,9 @@ class ErrorType(Enum):
     syntaxError = 1
     semanticError = 2
     warning = 3
+
+
+class SymbolType(Enum):
+    variable = 0
+    function = 1
+    package = 2 # This actually represents package or class name

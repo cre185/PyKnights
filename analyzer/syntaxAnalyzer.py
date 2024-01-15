@@ -1,7 +1,6 @@
-from errorHandler import ErrorType
 from utils import *
 from collections import deque
-from treelib import Node, Tree
+from treelib import Tree
 
 
 class SyntaxAnalyzer:
@@ -62,6 +61,9 @@ class SyntaxAnalyzer:
             (Signal.import_goods, [Token('', TokenType.identifier), Signal.identifier_list_part]),
             (Signal.import_goods, [Token('*', TokenType.operator)]), # 50
             (Signal.line, [Signal.readable]),
+            (Signal.readable_after_identifier, [Token('and', TokenType.reserved), Signal.readable]),
+            (Signal.readable_after_identifier, [Token('or', TokenType.reserved), Signal.readable]),
+            (Signal.readable, [Token('not', TokenType.reserved), Signal.readable]),
         ]
 
     def table(self, non_terminal, token):
@@ -136,6 +138,8 @@ class SyntaxAnalyzer:
                     return 29
                 elif token.tokenType == TokenType.reserved and token.token == 'None':
                     return 30
+                elif token.tokenType == TokenType.reserved and token.token == 'not':
+                    return 54
             case Signal.readable_after_identifier:
                 if token.tokenType == TokenType.separator and token.token == '.':
                     return 31
@@ -147,6 +151,10 @@ class SyntaxAnalyzer:
                     return 34
                 elif token.tokenType == TokenType.reserved and token.token == 'in':
                     return 35
+                elif token.tokenType == TokenType.reserved and token.token == 'and':
+                    return 52
+                elif token.tokenType == TokenType.reserved and token.token == 'or':
+                    return 53
                 else:
                     return 36
             case Signal.readable_list_part:

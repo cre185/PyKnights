@@ -1,6 +1,3 @@
-from enum import Enum
-from utils import ErrorType
-
 class Error:
     def __init__(self, errorType, errorText):
         self.errorType = errorType
