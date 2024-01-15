@@ -1,0 +1,25 @@
+{
+  "name": "pyknights",
+  "displayName": "Pyknights",
+  "description": "a custom python hightlighter",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.54.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "python",
+      "aliases": ["Python", "python"],
+      "extensions": [".py"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "python",
+      "scopeName": "source.pyknightsPython",
+      "path": "./syntaxes/python.tmLanguage.json"
+    }]
+  }
+}
