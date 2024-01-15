@@ -51,6 +51,8 @@ class LexicalAnalyzer:
     
     def kleene_positive(self, nfa):
         return nfa + nfa.kleene_star()
+    def kleene_query(self, nfa):
+        return self.epsilon_nfa.union(nfa)
 
     # @time_count
     def init_nfa(self):
@@ -66,10 +68,21 @@ class LexicalAnalyzer:
         # Constants
         num_list = [chr(i) for i in range(ord('0'), ord('9')+1)]
         num = self.range_nfa(num_list)
-        num_except = self.range_nfa([i for i in self.all_char if i not in num_list and i != '.'])
+        num_2 = self.range_nfa([i for i in ['0','1']])
+        num_8 = self.range_nfa([i for i in ['0','1','2','3','4','5','6','7']])
+        num_16 = self.range_nfa([i for i in ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','A','B','C','D','E','F']])
+        int_except = self.range_nfa([i for i in self.all_char if i not in num_list and i not in ['.', 'x', 'X', 'o', 'O', 'b', 'B', 'j','J', 'e', 'E']])
+        float_except = self.range_nfa([i for i in self.all_char if i not in num_list and i not in ['j','J', 'e', 'E']])
         num_end = self.range_nfa([i for i in self.all_char if i not in num_list])
-        self.nfa.append(self.kleene_positive(num) + num_except)
-        self.nfa.append(self.kleene_positive(num) + self.range_nfa('.') + num.kleene_star() + num_end)
+        num_16_end = self.range_nfa([i for i in self.all_char if i not in num_16])
+        self.nfa.append(self.kleene_positive(num) + self.kleene_query(self.range_nfa(['j','J'])) + int_except)
+        self.nfa.append(self.kleene_positive(num) + self.range_nfa('.') + num.kleene_star() + self.kleene_query(self.range_nfa(['j','J'])) + float_except)
+        self.nfa.append(self.range_str_nfa(['0b', '0B']) + self.kleene_positive(num_2) + num_end)
+        self.nfa.append(self.range_str_nfa(['0o', '0O']) + self.kleene_positive(num_8) + num_end)
+        self.nfa.append(self.range_str_nfa(['0x', '0X']) + self.kleene_positive(num_16) + num_16_end)
+        self.nfa.append(self.kleene_positive(num) + self.kleene_query(self.range_nfa('.') + num.kleene_star()) +
+                        self.range_nfa(['e', 'E']) + self.kleene_positive(num) + num_end)
+
         # Operators and assigners
         double_operator_except = [i for i in self.all_char if i not in '=*/><']
         triple_operator_except = [i for i in self.all_char if i not in '=']
@@ -133,26 +146,26 @@ class LexicalAnalyzer:
                     flag = True
                 if not self.states[k].isdisjoint(nfa.final_states):
                     # Need to leave last character out if it's: reserved words, identifiers, constants, spaces, comments
-                    if k in [0,1,2,3,4,5,9,12,14,15]:
+                    if k in [0,1,2,3,4,5,6,7,8,9,13,16,18,19]:
                         i-=1
                     # Generate token
                     token = tokens[j:i+1]
                     if k in [0, 1]:
                         token_list.append(Token(token, TokenType(k)))
-                    elif k in [2, 3]:
+                    elif k in [2, 3, 4, 5, 6, 7]:
                         token_list.append(Token(token, TokenType(2)))
-                    elif k in [4, 5, 6]:
+                    elif k in [8, 9, 10]:
                         if token[-1]=='=' and token!='==': # Then it's an assigner
                             token_list.append(Token(token, TokenType(9)))
                         else:
                             token_list.append(Token(token, TokenType(3)))
-                    elif k == 7:
+                    elif k == 11:
                         token_list.append(Token(token, TokenType(4)))
-                    elif k in [8, 9, 10, 11, 12, 13]:
+                    elif k in [12, 13, 14, 15, 16, 17]:
                         token_list.append(Token(token, TokenType(5)))
-                    elif k == 14:
+                    elif k == 18:
                         token_list.append(Token(token, TokenType(6)))
-                    elif k == 15:
+                    elif k == 19:
                         token_list.append(Token(token, TokenType(7)))
                     # Reset states
                     j=i+1
