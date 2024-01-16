@@ -49,5 +49,3 @@ class colorTable:
                 theToken["endRow"] = row - 1
             theTokens.append(theToken)
         return theTokens
-            
-

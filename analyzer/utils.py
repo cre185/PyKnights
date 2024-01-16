@@ -62,6 +62,8 @@ class Signal(Enum):
     ret_instruct = 12
     array_range = 13
     all_num = 14
+    before_slice = 15
+    after_slice = 16
     
 
 class ErrorType(Enum):
@@ -94,6 +96,8 @@ def generate_HTML(text, colors):
             colored_text = lines[start_line][start_row:end_row]
             if colored_text == "":
                 colored_text = "\n"
+        elif start_line + 1 == end_line:
+            colored_text = lines[start_line][start_row:] + "\n" + lines[end_line][:end_row]
         else:
             colored_text = lines[start_line][start_row:] + "\n" + "\n".join(lines[start_line+1:end_line]) + "\n" + lines[end_line][:end_row]
 
@@ -126,7 +130,6 @@ def generate_HTML(text, colors):
 </body>
 </html>
 """
-
     # 写入HTML文件
     with open("highlighted.html", "w") as f:
         f.write(html)

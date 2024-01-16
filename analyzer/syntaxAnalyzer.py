@@ -42,7 +42,7 @@ class SyntaxAnalyzer:
             (Signal.readable, [Token('None', TokenType.reserved)]), # 30
             (Signal.readable_after_identifier, [Token('.', TokenType.separator), Token('', TokenType.identifier), Signal.readable_after_identifier]),
             (Signal.readable_after_identifier, [Token('(', TokenType.separator), Signal.readable_list, Token(')', TokenType.separator), Signal.readable_after_identifier]),
-            (Signal.readable_after_identifier, [Token('[', TokenType.separator), Signal.readable, Token(']', TokenType.separator), Signal.readable_after_identifier]),
+            (Signal.readable_after_identifier, [Token('[', TokenType.separator), Signal.before_slice, Token(']', TokenType.separator), Signal.readable_after_identifier]),
             (Signal.readable_after_identifier, [Token('', TokenType.operator), Signal.readable, Signal.readable_after_identifier]),
             (Signal.readable_after_identifier, [Token('in', TokenType.reserved), Signal.readable]), # 35
             (Signal.readable_after_identifier, []),
@@ -66,12 +66,16 @@ class SyntaxAnalyzer:
             (Signal.readable, [Token('not', TokenType.reserved), Signal.readable]),
             (Signal.line,[Token('for', TokenType.reserved), Token('', TokenType.identifier), Token('in', TokenType.reserved),
                           Signal.readable, Token(':', TokenType.separator), Token('+', TokenType.space), Signal.line, Signal.align_end]), # 55
-            (Signal.ret_instruct, [Token('->', TokenType.operator), Signal.readable]),
+            (Signal.ret_instruct, [Token('->', TokenType.operator), Token('', TokenType.identifier), Signal.after_identifier]),
             (Signal.ret_instruct, []),
-            (Signal.array_range,[Token(':', TokenType.separator), Signal.all_num]),
-            (Signal.array_range,[]),
-            (Signal.all_num,[Token('', TokenType.constant)]), # 60
-            (Signal.all_num,[Token('-', TokenType.operator), Token('', TokenType.constant)]),
+            (Signal.array_range, [Token(':', TokenType.separator), Signal.after_slice]),
+            (Signal.array_range, []),
+            (Signal.all_num, [Token('', TokenType.constant)]), # 60
+            (Signal.all_num, [Token('-', TokenType.operator), Token('', TokenType.constant)]),
+            (Signal.before_slice, [Token(':', TokenType.separator), Signal.all_num]),
+            (Signal.before_slice, [Signal.readable, Signal.array_range]),
+            (Signal.after_slice, [Signal.readable]),
+            (Signal.after_slice, []), # 65
         ]
 
     def table(self, non_terminal, token):
@@ -216,6 +220,16 @@ class SyntaxAnalyzer:
                     return 60
                 elif token.tokenType == TokenType.operator and token.token == '-':
                     return 61
+            case Signal.before_slice:
+                if token.tokenType == TokenType.separator and token.token == ':':
+                    return 62
+                else:
+                    return 63
+            case Signal.after_slice:
+                if token.tokenType == TokenType.separator and token.token == ']':
+                    return 65
+                else:
+                    return 64
         return -1
         
     def preprocess(self, tokens):
@@ -242,16 +256,20 @@ class SyntaxAnalyzer:
                             tokens.insert(i, Token('0', TokenType.space))
                         for j in range(abs(shift_count)):
                             tokens.insert(i, Token(sig, TokenType.space))
-                        i+=abs(shift_count)
+                        i+=abs(shift_count)-1+(shift_count<0)
                         history_space=tmp
                     else:
                         tokens[i].token = '0'
-            elif tokens[i].tokenType == TokenType.comment:
+            i+=1
+        i=0
+        while i < len(tokens):
+            if tokens[i].tokenType == TokenType.comment:
                 tokens=tokens[:i]+tokens[i+1:]
                 if tokens[i].tokenType == TokenType.space and i>0 and tokens[i-1].tokenType == TokenType.space:
-                    tokens=tokens[:i-1]+tokens[i:]
-                    i-=1
-                continue
+                    if tokens[i].token=='0':
+                        tokens=tokens[:i]+tokens[i+1:]
+                    elif tokens[i-1].token=='0':
+                        tokens=tokens[:i-1]+tokens[i:]
             i+=1
         while len(tokens)>0 and tokens[0].tokenType == TokenType.space:
             tokens=tokens[1:]

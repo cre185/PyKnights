@@ -13,5 +13,7 @@ symbolTable = {
     'len': SymbolProp(SymbolType.function),
     'range': SymbolProp(SymbolType.function),
     'input': SymbolProp(SymbolType.function),
+    'append': SymbolProp(SymbolType.function),
+    'str': SymbolProp(SymbolType.package),
     'list': SymbolProp(SymbolType.package),
 }

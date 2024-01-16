@@ -159,7 +159,7 @@ class LexicalAnalyzer:
                     elif k in [2, 3, 4, 5, 6, 7]:
                         token_list.append(Token(token, TokenType(2)))
                     elif k in [8, 9, 10]:
-                        if token[-1]=='=' and token!='==': # Then it's an assigner
+                        if token[-1]=='=' and token!='==' and token!='!=': # Then it's an assigner
                             token_list.append(Token(token, TokenType(9)))
                         else:
                             token_list.append(Token(token, TokenType(3)))
