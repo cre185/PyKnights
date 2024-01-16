@@ -4,7 +4,7 @@ from main import *
 
 class MyDFA:
     def __init__(self, properties):
-        self.properties = properties
+        self.properties = properties    
         self.tag = 'MyDFA'
         self.notice = 'This is a test'
 

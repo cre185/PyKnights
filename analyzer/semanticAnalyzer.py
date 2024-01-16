@@ -79,3 +79,5 @@ class SemanticAnalyzer:
     def analyze(self, parse_tree):
         self.parse_tree = parse_tree
         self.parse_S(parse_tree[parse_tree.root])
+
+    

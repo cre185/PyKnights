@@ -4,10 +4,14 @@ from lexicalAnalyzer import *
 from syntaxAnalyzer import *
 from semanticAnalyzer import *
 from symbolTable import *
+from colorTable import *
 
 import argparse
 
 errorHandler = ErrorHandler()
+
+
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Lexical Analyzer.')
@@ -25,9 +29,7 @@ if __name__ == "__main__":
         errorHandler.clear()
         print('lexical analysis finished')
         parse_tokens = copy.deepcopy(tokens)
-        parse_tree = SA.analyze(tokens)
-        for token in tokens:
-            print(token)
+        parse_tree = SA.analyze(parse_tokens)
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
@@ -40,3 +42,8 @@ if __name__ == "__main__":
         print('semantic analysis finished')
         errorHandler.handleError()
         errorHandler.clear()
+        for symbol in symbolTable:
+            print(symbol, symbolTable[symbol])
+        typeTable = colorTable.getColor(tokens, symbolTable)
+        print(typeTable)
+        
