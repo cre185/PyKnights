@@ -25,7 +25,7 @@ if __name__ == "__main__":
         errorHandler.clear()
         print('lexical analysis finished')
         parse_tokens = copy.deepcopy(tokens)
-        parse_tree = SA.analyze(tokens)
+        parse_tree = SA.analyze(parse_tokens)
         for token in tokens:
             print(token)
         errorHandler.handleError()
