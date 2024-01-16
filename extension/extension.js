@@ -25,6 +25,13 @@ function activate(context) {
 	});
 
 	context.subscriptions.push(disposable);
+
+	vscode.workspace.onDidChangeTextDocument(event => {
+        if (event.document.languageId === 'python') {
+            console.log('Python code has been edited!');
+			// todo: run python code for lexical, syntactic, semantic analysis
+        }
+    }, null, context.subscriptions);
 }
 
 // This method is called when your extension is deactivated
