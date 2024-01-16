@@ -13,7 +13,7 @@ class SyntaxAnalyzer:
             (Signal.line, [Token('import', TokenType.reserved), Token('', TokenType.identifier)]),
             (Signal.line, [Token('from', TokenType.reserved), Token('', TokenType.identifier), Token('import', TokenType.reserved), Signal.import_goods]),
             (Signal.line, [Token('def', TokenType.reserved), Token('', TokenType.identifier), Token('(', TokenType.separator), Signal.identifier_list, \
-                           Token(')', TokenType.separator), Token(':', TokenType.separator), Token('+', TokenType.space), Signal.line, Signal.align_end]),
+                           Token(')', TokenType.separator), Signal.ret_instruct, Token(':', TokenType.separator), Token('+', TokenType.space), Signal.line, Signal.align_end]),
             (Signal.line, [Token('while', TokenType.reserved), Signal.readable, Token(':', TokenType.separator), Token('+', TokenType.space), Signal.line, Signal.align_end]), # 5
             (Signal.line, [Token('if', TokenType.reserved), Signal.readable, Token(':', TokenType.separator), Token('+', TokenType.space), Signal.line, Signal.align_end]),
             (Signal.line, [Token('break', TokenType.reserved)]),
@@ -32,8 +32,8 @@ class SyntaxAnalyzer:
             (Signal.align_end, [Token('0', TokenType.space), Signal.line, Signal.align_end]), # 20
             (Signal.align_end, []),
             (Signal.readable, [Token('', TokenType.identifier), Signal.readable_after_identifier]),
-            (Signal.readable, [Token('', TokenType.constant), Signal.readable_after_identifier]),
-            (Signal.readable, [Token('-', TokenType.operator), Token('', TokenType.constant), Signal.readable_after_identifier]),
+            (Signal.readable, [Signal.all_num, Signal.readable_after_identifier]),
+            (Signal.readable, [Token(':', TokenType.separator), Signal.all_num, Signal.readable_after_identifier]),
             (Signal.readable, [Token('', TokenType.string), Signal.readable_after_identifier]), # 25
             (Signal.readable, [Token('[', TokenType.separator), Signal.readable_list, Token(']', TokenType.separator)]),
             (Signal.readable, [Token('(', TokenType.separator), Signal.readable_list, Token(')', TokenType.separator)]),
@@ -42,7 +42,7 @@ class SyntaxAnalyzer:
             (Signal.readable, [Token('None', TokenType.reserved)]), # 30
             (Signal.readable_after_identifier, [Token('.', TokenType.separator), Token('', TokenType.identifier), Signal.readable_after_identifier]),
             (Signal.readable_after_identifier, [Token('(', TokenType.separator), Signal.readable_list, Token(')', TokenType.separator), Signal.readable_after_identifier]),
-            (Signal.readable_after_identifier, [Token('[', TokenType.separator), Signal.readable, Token(']', TokenType.separator), Signal.readable_after_identifier]),
+            (Signal.readable_after_identifier, [Token('[', TokenType.separator), Signal.before_slice, Token(']', TokenType.separator), Signal.readable_after_identifier]),
             (Signal.readable_after_identifier, [Token('', TokenType.operator), Signal.readable, Signal.readable_after_identifier]),
             (Signal.readable_after_identifier, [Token('in', TokenType.reserved), Signal.readable]), # 35
             (Signal.readable_after_identifier, []),
@@ -64,6 +64,18 @@ class SyntaxAnalyzer:
             (Signal.readable_after_identifier, [Token('and', TokenType.reserved), Signal.readable]),
             (Signal.readable_after_identifier, [Token('or', TokenType.reserved), Signal.readable]),
             (Signal.readable, [Token('not', TokenType.reserved), Signal.readable]),
+            (Signal.line,[Token('for', TokenType.reserved), Token('', TokenType.identifier), Token('in', TokenType.reserved),
+                          Signal.readable, Token(':', TokenType.separator), Token('+', TokenType.space), Signal.line, Signal.align_end]), # 55
+            (Signal.ret_instruct, [Token('->', TokenType.operator), Token('', TokenType.identifier), Signal.after_identifier]),
+            (Signal.ret_instruct, []),
+            (Signal.array_range, [Token(':', TokenType.separator), Signal.after_slice]),
+            (Signal.array_range, []),
+            (Signal.all_num, [Token('', TokenType.constant)]), # 60
+            (Signal.all_num, [Token('-', TokenType.operator), Token('', TokenType.constant)]),
+            (Signal.before_slice, [Token(':', TokenType.separator), Signal.all_num]),
+            (Signal.before_slice, [Signal.readable, Signal.array_range]),
+            (Signal.after_slice, [Signal.readable]),
+            (Signal.after_slice, []), # 65
         ]
 
     def table(self, non_terminal, token):
@@ -103,6 +115,8 @@ class SyntaxAnalyzer:
                     return 14
                 elif token.tokenType == TokenType.reserved and token.token == 'class':
                     return 15
+                elif token.tokenType == TokenType.reserved and token.token == 'for':
+                    return 55
                 elif token.tokenType == TokenType.identifier:
                     return 16
                 else:
@@ -122,9 +136,9 @@ class SyntaxAnalyzer:
             case Signal.readable:
                 if token.tokenType == TokenType.identifier:
                     return 22
-                elif token.tokenType == TokenType.constant:
+                elif token.tokenType == TokenType.constant or (token.tokenType == TokenType.operator and token.token == '-'):
                     return 23
-                elif token.tokenType == TokenType.operator and token.token == '-':
+                elif token.tokenType == TokenType.separator and token.token == ':':
                     return 24
                 elif token.tokenType == TokenType.string:
                     return 25
@@ -191,6 +205,31 @@ class SyntaxAnalyzer:
                     return 49
                 elif token.tokenType == TokenType.operator and token.token == '*':
                     return 50
+            case Signal.ret_instruct:
+                if token.tokenType == TokenType.operator and token.token == '->':
+                    return 56
+                else:
+                    return 57
+            case Signal.array_range:
+                if token.tokenType == TokenType.separator and token.token == ':':
+                    return 58
+                else:
+                    return 59
+            case Signal.all_num:
+                if token.tokenType == TokenType.constant:
+                    return 60
+                elif token.tokenType == TokenType.operator and token.token == '-':
+                    return 61
+            case Signal.before_slice:
+                if token.tokenType == TokenType.separator and token.token == ':':
+                    return 62
+                else:
+                    return 63
+            case Signal.after_slice:
+                if token.tokenType == TokenType.separator and token.token == ']':
+                    return 65
+                else:
+                    return 64
         return -1
         
     def preprocess(self, tokens):
@@ -217,16 +256,20 @@ class SyntaxAnalyzer:
                             tokens.insert(i, Token('0', TokenType.space))
                         for j in range(abs(shift_count)):
                             tokens.insert(i, Token(sig, TokenType.space))
-                        i+=abs(shift_count)
+                        i+=abs(shift_count)-1+(shift_count<0)
                         history_space=tmp
                     else:
                         tokens[i].token = '0'
-            elif tokens[i].tokenType == TokenType.comment:
+            i+=1
+        i=0
+        while i < len(tokens):
+            if tokens[i].tokenType == TokenType.comment:
                 tokens=tokens[:i]+tokens[i+1:]
                 if tokens[i].tokenType == TokenType.space and i>0 and tokens[i-1].tokenType == TokenType.space:
-                    tokens=tokens[:i-1]+tokens[i:]
-                    i-=1
-                continue
+                    if tokens[i].token=='0':
+                        tokens=tokens[:i]+tokens[i+1:]
+                    elif tokens[i-1].token=='0':
+                        tokens=tokens[:i-1]+tokens[i:]
             i+=1
         while len(tokens)>0 and tokens[0].tokenType == TokenType.space:
             tokens=tokens[1:]

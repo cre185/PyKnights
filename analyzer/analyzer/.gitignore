@@ -1,0 +1,5 @@
+*.dot
+*.json
+highlighted.html
+__pycache__/
+.idea/
