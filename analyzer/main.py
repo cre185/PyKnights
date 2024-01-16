@@ -1,3 +1,4 @@
+import copy
 from errorHandler import *
 from lexicalAnalyzer import *
 from syntaxAnalyzer import *
@@ -23,7 +24,10 @@ if __name__ == "__main__":
         errorHandler.handleError()
         errorHandler.clear()
         print('lexical analysis finished')
+        parse_tokens = copy.deepcopy(tokens)
         parse_tree = SA.analyze(tokens)
+        for token in tokens:
+            print(token)
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
@@ -36,5 +40,3 @@ if __name__ == "__main__":
         print('semantic analysis finished')
         errorHandler.handleError()
         errorHandler.clear()
-        for key in symbolTable:
-            print(key, symbolTable[key])
