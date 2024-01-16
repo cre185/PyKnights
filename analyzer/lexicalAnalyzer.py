@@ -153,7 +153,8 @@ class LexicalAnalyzer:
                     if k == 0:
                         token_list.append(Token(token, TokenType(0)))
                     elif k == 1:
-                        symbolTable[token] = SymbolProp(SymbolType.variable)
+                        if not token in symbolTable:
+                            symbolTable[token] = SymbolProp(SymbolType.variable)
                         token_list.append(Token(token, TokenType(1)))
                     elif k in [2, 3, 4, 5, 6, 7]:
                         token_list.append(Token(token, TokenType(2)))
