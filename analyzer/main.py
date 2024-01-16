@@ -30,6 +30,9 @@ if __name__ == "__main__":
         print('lexical analysis finished')
         parse_tokens = copy.deepcopy(tokens)
         parse_tree = SA.analyze(parse_tokens)
+        for token in tokens:
+            print(token)
+        parse_tree = SA.analyze(parse_tokens)
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
