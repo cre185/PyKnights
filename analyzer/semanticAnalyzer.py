@@ -16,6 +16,7 @@ class SemanticAnalyzer:
     def parse_line(self, node):
         children = self.parse_tree.children(node.identifier)
         i = 0
+        print(children)
         while i < len(children):
             child = children[i]
             if child.tag == 'from':
@@ -31,6 +32,9 @@ class SemanticAnalyzer:
                     i += 1
                 self.parse_line_in_class(children[i], classname)
                 self.parse_align_end(children[i+1], classname)
+            elif child.tag == 'def':
+                i += 1
+                symbolTable[children[i].tag].symbolType = SymbolType.function
             i += 1
 
     def parse_line_in_class(self, node, classname):
