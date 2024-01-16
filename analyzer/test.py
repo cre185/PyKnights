@@ -1,14 +1,23 @@
 import random
 from utils import time_count
 from main import *
-
+a = [1,2,3]
+b = a[:-1]
 class MyDFA:
     def __init__(self, properties):
-        self.properties = properties
         self.tag = 'MyDFA'
         self.notice = 'This is a test'
+        def hehe(self):
+            def hoho(self):
+                print('hoho')
+            return self.tag
 
-    def just_a_test(self):
+    class MyInnerDFA:
+        def haha(self, properties):
+            self.tag = 'MyInnerDFA'
+            self.notice = 'This is a test'
+
+    def just_a_test(self) -> str:
         print('This is just a test')
         print('If you don\'t trust me, see: ' + self.notice)
         return self.tag
@@ -20,14 +29,15 @@ an_outer_test()
 
 aDFA = MyDFA('This is a DFA')
 aDFA.just_a_test()
-
 string_list = ['a', 'b', 'deaf\'s asdaw', '''
     This is a test''']
-number_list = [1, 114514, 234.567, -18.290, 0003.40, 1., 0xAa0, 1 + 8.3j, 9.6e4, 8.e6]
+number_list = [1, 114514, 234.567, -18.290, 0003.40, 1., 0xAa0, 1+8.3j, 9.6e4, 8.e6]
 
 lives = 3
 
 words = ['pizza', 'fairy', 'teeth', 'shirt', 'otter', 'plane']
+
+
 secret_word = random.choice(words)
 # print(secret_word)
 

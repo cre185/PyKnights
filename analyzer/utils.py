@@ -59,6 +59,9 @@ class Signal(Enum):
     readable_after_identifier = 9
     inherit = 10
     import_goods = 11
+    ret_instruct = 12
+    array_range = 13
+    all_num = 14
     
 
 class ErrorType(Enum):
@@ -73,3 +76,57 @@ class SymbolType(Enum):
     variable = 0
     function = 1
     package = 2 # This actually represents package or class name
+    globe = 3
+
+def generate_HTML(text, colors):
+    code = ""
+    color_iter = iter(colors)
+    color = next(color_iter, None)
+
+    lines = text.split("\n")
+
+    for color in colors:
+        start_line, start_row = color["startLine"] - 1, color["startRow"] - 1
+        end_line, end_row = color["endLine"] - 1, color["endRow"]
+
+        # 获取颜色块对应的文本
+        if start_line == end_line:
+            colored_text = lines[start_line][start_row:end_row]
+            if colored_text == "":
+                colored_text = "\n"
+        else:
+            colored_text = lines[start_line][start_row:] + "\n" + "\n".join(lines[start_line+1:end_line]) + "\n" + lines[end_line][:end_row]
+
+        # 将文本包裹在相应的CSS类中
+        code += f'<span class="color{color["type"]}">{colored_text}</span>'
+
+    # 填充HTML模板
+    html = """<html>
+<head>
+    <style>
+    body { background-color: #808080; }
+    .color0 { color: #DA70D6; }
+    .color1 { color: #00fa9a; }
+    .color2 { color: black; }
+    .color3 { color: #F0E68C; }
+    .color4 { color: orange; }
+    .color5 { color: white; }
+    .color6 { color: #228B22; }
+    .color7 { color: red; }
+    .color8 { color: black; }
+    .color9 { color: #00BFFF; }
+    .color10 { color: yellow; }
+    .color11 { color: #00FF00; }
+    </style>
+</head>
+<body>
+    <pre>
+"""+code+"""
+    </pre>
+</body>
+</html>
+"""
+
+    # 写入HTML文件
+    with open("highlighted.html", "w") as f:
+        f.write(html)

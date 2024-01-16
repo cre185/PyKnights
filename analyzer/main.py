@@ -4,6 +4,7 @@ from lexicalAnalyzer import *
 from syntaxAnalyzer import *
 from semanticAnalyzer import *
 from symbolTable import *
+from colorTable import *
 
 import argparse
 
@@ -20,14 +21,13 @@ if __name__ == "__main__":
     SE = SemanticAnalyzer(errorHandler)
     with open(r"./test.py" if not args.file else args.file, "r", encoding='utf-8') as myfile:
         script = myfile.read()
-        tokens = LA.analyze(script)
+        source_script = copy.deepcopy(script)
+        tokens = LA.analyze(source_script)
         errorHandler.handleError()
         errorHandler.clear()
         print('lexical analysis finished')
         parse_tokens = copy.deepcopy(tokens)
         parse_tree = SA.analyze(parse_tokens)
-        for token in tokens:
-            print(token)
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
@@ -40,3 +40,5 @@ if __name__ == "__main__":
         print('semantic analysis finished')
         errorHandler.handleError()
         errorHandler.clear()
+        colors = colorTable.getColor(tokens,symbolTable)
+        generate_HTML(script, colors)

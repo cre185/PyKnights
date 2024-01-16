@@ -18,5 +18,3 @@ pip install -r requirements.txt
 python main.py  
 ```
 脚本带有命令行参数功能 可以通过添加`-h`参数查看帮助  
-目前仅包含一个可选参数`-f` 后跟文件路径表示待分析的文件路径   
-默认将分析目录下的`test.py`文件
