@@ -54,12 +54,14 @@ class MyDocumentSemanticTokensProvider {
 class MyCompletionItemProvider {
 	provideCompletionItems(document, position, token, context) {
 		const { spawn } = require('child_process');
-		const python = spawn('python', ['./analyzer/main.py', '--file', document.fileName, '--complete', `${position.line},${position.character}`]);
+		let filePath = document.fileName.replace(/\\/g, '\\\\');
+		const python = spawn('python', ['./analyzer/main.py', '--file', filePath, '--complete', `${position.line},${position.character}`]);
 
 		const fs = require('fs');
 		const path = require('path');
 		const filepath = path.join(__dirname, './analyzer/completions.pyknights');
 		const completions = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+		console.log(completions);
 
 		return completions.map(completion => {
 			let item = new vscode.CompletionItem(completion.name);
