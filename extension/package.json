@@ -38,25 +38,6 @@
         "path": "./syntaxes/pyknightsPython.tmLanguage.json"
       }
     ],
-    "themes": [
-      {
-        "name": "PyKnights",
-        "semanticTokenColors": {
-          "variable": "#FF0000",
-          "function": "#FF0000",
-          "package": "#FF0000",
-          "reserved": "#FF0000",
-          "constant": "#FF0000",
-          "operator": "#FF0000",
-          "separator": "#FF0000",
-          "string": "#FF0000",
-          "space": "#FF0000",
-          "comment": "#FF0000",
-          "error": "#FF0000",
-          "assigner": "#FF0000"
-        }
-      }
-    ],
     "semanticTokenScopes": [
       {
         "scope": "reserved",

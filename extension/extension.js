@@ -98,6 +98,12 @@ function activate(context) {
 		legend
 	));
 
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
+		{ language: 'python' },
+		new MyCompletionItemProvider(),
+		'.'
+	));
+
 	vscode.workspace.onDidChangeTextDocument(event => {
         if (event.document.languageId === 'python') {
             console.log('Python code has been edited!');

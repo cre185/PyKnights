@@ -44,9 +44,13 @@ if __name__ == "__main__":
         errorHandler.handleError()
         errorHandler.clear()
         colors = colorTable.getColor(tokens,symbolTable)
+        with open('colors.pyknights', 'w') as f:
+            f.write(str(colors))
         generate_HTML(script, colors)
     except:
         errorHandler.handleError()
         errorHandler.clear()
         colors = colorTable.getColor(tokens,symbolTable)
+        with open('colors.pyknights', 'w') as f:
+            f.write(str(colors))
         generate_HTML(script, colors)
