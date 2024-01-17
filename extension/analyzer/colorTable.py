@@ -29,14 +29,14 @@ class colorTable:
             theToken["token"] = token.token
             type = str(type)
             theToken["type"] = getColorbyType[type]
-            theToken["startLine"] = line
+            theToken["startRow"] = line
             theToken["startColumn"] = column
             if token.tokenType == TokenType.space or token.tokenType == TokenType.string:
                 tokenLenth = 0
                 for char in token.token:
                     tokenLenth += 1
                     if tokenLenth == len(token.token):
-                        theToken["endLine"] = line
+                        theToken["endRow"] = line
                         theToken["endColumn"] = column
                     if char == '\n':
                         line += 1
@@ -45,7 +45,7 @@ class colorTable:
                         column += 1
             else:
                 column += len(token.token)
-                theToken["endLine"] = line
+                theToken["endRow"] = line
                 theToken["endColumn"] = column - 1
             theTokens.append(theToken)
         return theTokens

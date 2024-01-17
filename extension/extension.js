@@ -51,6 +51,18 @@ class MyDocumentSemanticTokensProvider {
 	}
 }
 
+class MyCompletionItemProvider {
+	provideCompletionItems(document, position, token, context) {
+		const { spawn } = require('child_process');
+		const python = spawn('python', ['./analyzer/main.py', '--file', document.fileName, '--complete', position.line+','+position.character]);
+
+		const fs = require('fs');
+		const path = require('path');
+		const filepath = path.join(__dirname, './analyzer/completions.pyknights');
+		const completions = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+	}
+}
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 

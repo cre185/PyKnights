@@ -14,13 +14,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Lexical Analyzer.')
     parser.add_argument('-f', '--file', help='Input file name')
     parser.add_argument('-d', '--dot', action='store_true', help='Output in dot file format')
+    parser.add_argument('-t', '--text', help='Input directly in command line')
+    parser.add_argument('-c', '--complete', help='Check the completion at designated position')
     args = parser.parse_args()
 
     LA = LexicalAnalyzer(errorHandler)
     SA = SyntaxAnalyzer(errorHandler)
     SE = SemanticAnalyzer(errorHandler)
-    with open(r"./test.py" if not args.file else args.file, "r", encoding='utf-8') as myfile:
-        script = myfile.read()
+    if args.text:
+        script = args.text
+    else:
+        with open(r"./test.py" if not args.file else args.file, "r", encoding='utf-8') as myfile:
+            script = myfile.read()
+    try:
         source_script = copy.deepcopy(script)
         tokens = LA.analyze(source_script)
         errorHandler.handleError()
@@ -31,13 +37,15 @@ if __name__ == "__main__":
         errorHandler.handleError()
         errorHandler.clear()
         print('syntax analysis finished')
-        '''if args.dot:
+        if args.dot:
             parse_tree.to_graphviz('tree.dot')
-        with open('tree.json', 'w') as outfile:
-            result = parse_tree.to_json()
-            outfile.write(result)'''
         SE.analyze(parse_tree)
         print('semantic analysis finished')
+        errorHandler.handleError()
+        errorHandler.clear()
+        colors = colorTable.getColor(tokens,symbolTable)
+        generate_HTML(script, colors)
+    except:
         errorHandler.handleError()
         errorHandler.clear()
         colors = colorTable.getColor(tokens,symbolTable)
