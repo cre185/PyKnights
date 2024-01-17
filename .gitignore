@@ -293,3 +293,5 @@ dist
 .pnp.*
 
 .vscode/
+extension/colors.pyknights
+extension/completions.pyknights

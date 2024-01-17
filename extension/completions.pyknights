@@ -1,10 +1,1 @@
-[
-    {
-        "name": "test",
-        "kind": "Variable"
-    },
-    {
-        "name": "testfunction",
-        "kind": "Function"
-    }
-]
+[{"name": "print", "type": "Function"}, {"name": "len", "type": "Function"}, {"name": "range", "type": "Function"}, {"name": "input", "type": "Function"}, {"name": "append", "type": "Function"}, {"name": "str", "type": "Class"}, {"name": "list", "type": "Class"}, {"name": "Test", "type": "Class"}, {"name": "a", "type": "Variable"}, {"name": "test", "type": "Variable"}]
