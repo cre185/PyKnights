@@ -48,4 +48,24 @@ if __name__ == "__main__":
     colors = colorTable.getColor(tokens,symbolTable)
     with open('colors.pyknights', 'w') as f:
         f.write(json.dumps(colors))
+    completionTable = []
+    completion = {}
+    for key, value in symbolTable.items():
+        if value.symbolType == SymbolType.function:
+            completion['name'] = key
+            completion['type'] = 'Function'
+            completionTable.append(completion)
+            completion = {}
+        elif value.symbolType == SymbolType.variable:
+            completion['name'] = key
+            completion['type'] = 'Variable'
+            completionTable.append(completion)
+            completion = {}
+        elif value.symbolType == SymbolType.package:
+            completion['name'] = key
+            completion['type'] = 'Class'
+            completionTable.append(completion)
+            completion = {}
+    with open('completions.pyknights', 'w') as f:
+        f.write(json.dumps(completionTable))
     generate_HTML(script, colors)
