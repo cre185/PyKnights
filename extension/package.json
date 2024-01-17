@@ -44,7 +44,23 @@
         "uiTheme": "vs-dark",
         "path": "./themes/pyknightsTheme.json"
       }
-    ]
+    ],
+    "semanticTokenScopes": {
+      "python": {
+        "variable": ["variable"],
+        "function": ["function"],
+        "package": ["namespace"],
+        "reserved": ["keyword"],
+        "constant": ["constant"],
+        "operator": ["operator"],
+        "separator": ["punctuation"],
+        "string": ["string"],
+        "space": ["whitespace"],
+        "comment": ["comment"],
+        "error": ["invalid"],
+        "assigner": ["operator"]
+      }
+    }
   },
   "scripts": {
     "lint": "eslint .",

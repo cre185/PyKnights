@@ -88,23 +88,23 @@ def generate_HTML(text, colors):
     lines = text.split("\n")
 
     for color in colors:
-        start_line, start_row = color["startLine"] - 1, color["startRow"] - 1
-        end_line, end_row = color["endLine"] - 1, color["endRow"]
+        start_line, start_column = color["startLine"] - 1, color["startColumn"] - 1
+        end_line, end_column = color["endLine"] - 1, color["endColumn"]
 
         # 获取颜色块对应的文本
         if start_line == end_line:
-            colored_text = lines[start_line][start_row:end_row]
+            colored_text = lines[start_line][start_column:end_column]
             if colored_text == "":
                 colored_text = "\n"
         elif start_line + 1 == end_line:
-            colored_text = lines[start_line][start_row:] + "\n" + lines[end_line][:end_row]
+            colored_text = lines[start_line][start_column:] + "\n" + lines[end_line][:end_column]
         else:
-            colored_text = lines[start_line][start_row:] + "\n" + "\n".join(lines[start_line+1:end_line]) + "\n" + lines[end_line][:end_row]
+            colored_text = lines[start_line][start_column:] + "\n" + "\n".join(lines[start_line+1:end_line]) + "\n" + lines[end_line][:end_column]
 
-        # 将文本包裹在相应的CSS类中
+        # 将文本包裹在相应的 CSS 类中
         code += f'<span class="color{color["type"]}">{colored_text}</span>'
 
-    # 填充HTML模板
+    # 填充 HTML 模板
     html = """<html>
 <head>
     <style>
@@ -130,6 +130,6 @@ def generate_HTML(text, colors):
 </body>
 </html>
 """
-    # 写入HTML文件
+    # 写入 HTML 文件
     with open("highlighted.html", "w") as f:
         f.write(html)

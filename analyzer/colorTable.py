@@ -18,7 +18,7 @@ getColorbyType = {
 class colorTable:
     def getColor(tokens,symbolTable):
         line = 1
-        row = 1
+        column = 1
         theTokens = []
         for token in tokens:
             theToken = {}
@@ -30,22 +30,22 @@ class colorTable:
             type = str(type)
             theToken["type"] = getColorbyType[type]
             theToken["startLine"] = line
-            theToken["startRow"] = row
+            theToken["startColumn"] = column
             if token.tokenType == TokenType.space or token.tokenType == TokenType.string:
                 tokenLenth = 0
                 for char in token.token:
                     tokenLenth += 1
                     if tokenLenth == len(token.token):
                         theToken["endLine"] = line
-                        theToken["endRow"] = row
+                        theToken["endColumn"] = column
                     if char == '\n':
                         line += 1
-                        row = 1
+                        column = 1
                     else:
-                        row += 1
+                        column += 1
             else:
-                row += len(token.token)
+                column += len(token.token)
                 theToken["endLine"] = line
-                theToken["endRow"] = row - 1
+                theToken["endColumn"] = column - 1
             theTokens.append(theToken)
         return theTokens
