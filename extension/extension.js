@@ -3,7 +3,7 @@
 const vscode = require('vscode');
 
 const legend = new vscode.SemanticTokensLegend(
-    ['reserved', 'constant', 'operator', 'separator', 'string', 'space', 'comment', 'error', 'assigner', 'variable', 'function', 'package'],
+    ['keyword', 'constant', 'operator', 'separator', 'string', 'space', 'comment', 'error', 'operator', 'variable', 'function', 'namespace'],
 	[]
 );
 class MyDocumentSemanticTokensProvider {
