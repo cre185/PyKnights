@@ -19,17 +19,18 @@ class MyDocumentSemanticTokensProvider {
 		// read that file as an array of dicts
 		// reinterpret that array to become the data part of SemanticTokens
 		// return that SemanticTokens
-
+		console.log("provideDocumentSemanticTokens called");
 		// 1. run python code at ./analyzer/main.py
 		const { spawn } = require('child_process');
-		const python = spawn('python', ['./analyzer/main.py', '--file', document.fileName]);
-
+		let filePath = document.fileName.replace(/\\/g, '\\\\');
+		const python = spawn('python', ['./analyzer/main.py', '--file', filePath]);
+		console.log("python: ", python);
 		// 2. read from ./analyzer/colors.pyknights
 		const fs = require('fs');
 		const path = require('path');
 		const filepath = path.join(__dirname, './analyzer/colors.pyknights');
 		const colors = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-
+		console.log("colors: ", colors);
 		// 3. reinterpret colors to become the data part of SemanticTokens
 		const builder = new vscode.SemanticTokensBuilder(legend);
 		for (const item of colors) {
