@@ -1,11 +1,11 @@
 import copy
+import json
 from errorHandler import *
 from lexicalAnalyzer import *
 from syntaxAnalyzer import *
 from semanticAnalyzer import *
 from symbolTable import *
 from colorTable import *
-
 import argparse
 
 errorHandler = ErrorHandler()
@@ -47,5 +47,5 @@ if __name__ == "__main__":
     errorHandler.clear()
     colors = colorTable.getColor(tokens,symbolTable)
     with open('colors.pyknights', 'w') as f:
-        f.write(str(colors))
+        f.write(json.dumps(colors))
     generate_HTML(script, colors)

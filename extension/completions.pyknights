@@ -1,0 +1,10 @@
+[
+    {
+        "name": "test",
+        "kind": "Variable"
+    },
+    {
+        "name": "testfunction",
+        "kind": "Function"
+    }
+]

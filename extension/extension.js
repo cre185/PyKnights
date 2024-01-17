@@ -19,32 +19,33 @@ class MyDocumentSemanticTokensProvider {
 		// read that file as an array of dicts
 		// reinterpret that array to become the data part of SemanticTokens
 		// return that SemanticTokens
-		console.log("provideDocumentSemanticTokens called");
 		// 1. run python code at ./analyzer/main.py
-		const { spawn } = require('child_process');
+		const { spawnSync } = require('child_process');
 		let filePath = document.fileName.replace(/\\/g, '\\\\');
-		const python = spawn('python', ['./analyzer/main.py', '--file', filePath]);
-		console.log("python: ", python);
-		// 2. read from ./analyzer/colors.pyknights
-		const fs = require('fs');
-		const path = require('path');
-		const filepath = path.join(__dirname, './analyzer/colors.pyknights');
-		const colors = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-		console.log("colors: ", colors);
-		// 3. reinterpret colors to become the data part of SemanticTokens
-		const builder = new vscode.SemanticTokensBuilder(legend);
-		for (const item of colors) {
-			builder.push(
-				item.startLine - 1,
-				item.startColumn - 1,
-				item.endColumn - item.startColumn + 1,
-				item.tokenType,
-				[]
-			);
+		const python = spawnSync('./analyzer/main.exe', ['--file', filePath], {cwd: __dirname});
+		if (python.error) {
+			console.error(`Failed to start subprocess. ${python.error}`);
 		}
-
-		// 4. return that SemanticTokens
-		return builder.build();
+		else{
+			console.log(`child process exited with code ${python.status}`);
+			const fs = require('fs');
+			const path = require('path');
+			const filepath = path.join(__dirname, './colors.pyknights');
+			let content = fs.readFileSync(filepath, 'utf8');
+			const colors = JSON.parse(content);
+			
+			const builder = new vscode.SemanticTokensBuilder(legend);
+			for (const item of colors) {
+				builder.push(
+					item.startLine - 1,
+					item.startColumn - 1,
+					item.endColumn - item.startColumn + 1,
+					item.tokenType,
+					[]
+				);
+			}
+			return builder.build();
+		}
 	}
 
 	provideDocumentRangeSemanticTokens(document, range) {
@@ -54,20 +55,24 @@ class MyDocumentSemanticTokensProvider {
 
 class MyCompletionItemProvider {
 	provideCompletionItems(document, position, token, context) {
-		const { spawn } = require('child_process');
+		const { spawnSync } = require('child_process');
 		let filePath = document.fileName.replace(/\\/g, '\\\\');
-		const python = spawn('python', ['./analyzer/main.py', '--file', filePath, '--complete', `${position.line},${position.character}`]);
+		const python = spawnSync('./analyzer/main.exe', ['--file', filePath, '--complete', `${position.line},${position.character}`], {cwd: __dirname});
 
-		const fs = require('fs');
-		const path = require('path');
-		const filepath = path.join(__dirname, './analyzer/completions.pyknights');
-		const completions = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-		console.log(completions);
-
-		return completions.map(completion => {
-			let item = new vscode.CompletionItem(completion.name);
-			return item;
-		});
+		if (python.error) {
+			console.error(`Failed to start subprocess. ${python.error}`);
+		} else {
+			console.log(`child process exited with code ${python.status}`);
+			const fs = require('fs');
+			const path = require('path');
+			const filepath = path.join(__dirname, './completions.pyknights');
+			const completions = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+			return completions.map(completion => {
+				let item = new vscode.CompletionItem(completion.name, vscode.CompletionItemKind[completion.kind]);
+				console.log(item);
+				return item;
+			});
+		}
 	}
 }
 
