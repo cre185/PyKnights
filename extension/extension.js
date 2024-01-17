@@ -4,7 +4,7 @@ const vscode = require('vscode');
 
 const legend = new vscode.SemanticTokensLegend(
     ['reserved', 'constant', 'operator', 'separator', 'string', 'space', 'comment', 'error', 'assigner', 'variable', 'function', 'package'],
-    []
+	[]
 );
 class MyDocumentSemanticTokensProvider {
 	constructor() {
@@ -12,14 +12,6 @@ class MyDocumentSemanticTokensProvider {
 	}
 
 	provideDocumentSemanticTokens(document) {
-		// run python code for lexical, syntactic, semantic analysis
-		// (assume this extention.js is at . )
-		// run ./analyzer/main.py
-		// it will generate a colors.pyknights file
-		// read that file as an array of dicts
-		// reinterpret that array to become the data part of SemanticTokens
-		// return that SemanticTokens
-		// 1. run python code at ./analyzer/main.py
 		const { spawnSync } = require('child_process');
 		let filePath = document.fileName.replace(/\\/g, '\\\\');
 		const python = spawnSync('python', ['./analyzer/main.py', '--file', filePath], {cwd: __dirname});
@@ -37,13 +29,13 @@ class MyDocumentSemanticTokensProvider {
 			const builder = new vscode.SemanticTokensBuilder(legend);
 			for (const item of colors) {
 				builder.push(
-					item.startLine - 1,
+					item.startRow - 1,
 					item.startColumn - 1,
 					item.endColumn - item.startColumn + 1,
-					item.tokenType,
-					[]
+					item.type
 				);
 			}
+			console.log(builder.build());
 			return builder.build();
 		}
 	}
@@ -108,15 +100,10 @@ function activate(context) {
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider(
 		{ language: 'python' },
 		new MyCompletionItemProvider(),
-		'.'
+		'.', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
 	));
 
-	vscode.workspace.onDidChangeTextDocument(event => {
-        if (event.document.languageId === 'python') {
-            console.log('Python code has been edited!');
-			// todo: run python code for lexical, syntactic, semantic analysis
-        }
-    }, null, context.subscriptions);
+	vscode.workspace.onDidChangeTextDocument(event => {}, null, context.subscriptions);
 }
 
 // This method is called when your extension is deactivated

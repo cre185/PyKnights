@@ -152,8 +152,7 @@
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "vscode-test",
-    "postinstall": "node setup.js"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -162,8 +161,7 @@
     "@vscode/test-cli": "^0.0.4",
     "@vscode/test-electron": "^2.3.8",
     "eslint": "^8.54.0",
-    "typescript": "^5.3.2",
-    "shelljs": "^0.8.4"
+    "typescript": "^5.3.2"
   },
   "dependencies": {
     "yeoman-generator": "^7.1.1"
