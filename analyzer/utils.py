@@ -64,11 +64,6 @@ class Signal(Enum):
     all_num = 14
     before_slice = 15
     after_slice = 16
-    ret_instruct = 12
-    array_range = 13
-    all_num = 14
-    before_slice = 15
-    after_slice = 16
     
 
 class ErrorType(Enum):
