@@ -22,7 +22,7 @@ class MyDocumentSemanticTokensProvider {
 		// 1. run python code at ./analyzer/main.py
 		const { spawnSync } = require('child_process');
 		let filePath = document.fileName.replace(/\\/g, '\\\\');
-		const python = spawnSync('./analyzer/main.exe', ['--file', filePath], {cwd: __dirname});
+		const python = spawnSync('python', ['./analyzer/main.py', '--file', filePath], {cwd: __dirname});
 		if (python.error) {
 			console.error(`Failed to start subprocess. ${python.error}`);
 		}
@@ -57,7 +57,7 @@ class MyCompletionItemProvider {
 	provideCompletionItems(document, position, token, context) {
 		const { spawnSync } = require('child_process');
 		let filePath = document.fileName.replace(/\\/g, '\\\\');
-		const python = spawnSync('./analyzer/main.exe', ['--file', filePath, '--complete', `${position.line},${position.character}`], {cwd: __dirname});
+		const python = spawnSync('./env/bin/python', ['./analyzer/main.py', '--file', filePath, '--complete', `${position.line},${position.character}`], {cwd: __dirname});
 
 		if (python.error) {
 			console.error(`Failed to start subprocess. ${python.error}`);

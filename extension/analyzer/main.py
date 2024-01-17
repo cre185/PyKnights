@@ -48,4 +48,4 @@ if __name__ == "__main__":
     colors = colorTable.getColor(tokens,symbolTable)
     with open('colors.pyknights', 'w') as f:
         f.write(json.dumps(colors))
-    generate_HTML(script, colors)
+    # generate_HTML(script, colors)
