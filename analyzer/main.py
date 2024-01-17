@@ -10,6 +10,9 @@ import argparse
 
 errorHandler = ErrorHandler()
 
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Lexical Analyzer.')
     parser.add_argument('-f', '--file', help='Input file name')
