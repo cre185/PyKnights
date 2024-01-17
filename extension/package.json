@@ -40,27 +40,133 @@
     ],
     "themes": [
       {
-        "label": "PyKnights",
-        "uiTheme": "vs-dark",
-        "path": "./themes/pyknightsTheme.json"
+        "name": "PyKnights",
+        "semanticTokenColors": {
+          "variable": "#FF0000",
+          "function": "#FF0000",
+          "package": "#FF0000",
+          "reserved": "#FF0000",
+          "constant": "#FF0000",
+          "operator": "#FF0000",
+          "separator": "#FF0000",
+          "string": "#FF0000",
+          "space": "#FF0000",
+          "comment": "#FF0000",
+          "error": "#FF0000",
+          "assigner": "#FF0000"
+        }
       }
     ],
-    "semanticTokenScopes": {
-      "python": {
-        "variable": ["variable"],
-        "function": ["function"],
-        "package": ["namespace"],
-        "reserved": ["keyword"],
-        "constant": ["constant"],
-        "operator": ["operator"],
-        "separator": ["punctuation"],
-        "string": ["string"],
-        "space": ["whitespace"],
-        "comment": ["comment"],
-        "error": ["invalid"],
-        "assigner": ["operator"]
+    "semanticTokenScopes": [
+      {
+        "scope": "reserved",
+        "light": {
+          "foreground": "#da70d6"
+        },
+        "dark": {
+          "foreground": "#da70d6"
+        }
+      },
+      {
+        "scope": "identifier",
+        "light": {
+          "foreground": "#00fa9a"
+        },
+        "dark": {
+          "foreground": "#00fa9a"
+        }
+      },
+      {
+        "scope": "function",
+        "light": {
+          "foreground": "#0080ff"
+        },
+        "dark": {
+          "foreground": "#0080ff"
+        }
+      },
+      {
+        "scope": "package",
+        "light": {
+          "foreground": "#22FF22"
+        },
+        "dark": {
+          "foreground": "#22FF22"
+        }
+      },
+      {
+        "scope": "constant",
+        "light": {
+          "foreground": "#f0e68c"
+        },
+        "dark": {
+          "foreground": "#f0e68c"
+        }
+      },
+      {
+        "scope": "operator",
+        "light": {
+          "foreground": "#22FF22"
+        },
+        "dark": {
+          "foreground": "#CCFF00"
+        }
+      },
+      {
+        "scope": "separator",
+        "light": {
+          "foreground": "black"
+        },
+        "dark": {
+          "foreground": "#ffffff"
+        }
+      },
+      {
+        "scope": "string",
+        "light": {
+          "foreground": "#ff7700"
+        },
+        "dark": {
+          "foreground": "#ff7700"
+        }
+      },
+      {
+        "scope": "space",
+        "light": {
+          "foreground": "#ffffff"
+        },
+        "dark": {
+          "foreground": "#ffffff"
+        }
+      },
+      {
+        "scope": "comment",
+        "light": {
+          "foreground": "#808080"
+        },
+        "dark": {
+          "foreground": "#808080"
+        }
+      },
+      {
+        "scope": "error",
+        "light": {
+          "foreground": "#ff0000"
+        },
+        "dark": {
+          "foreground": "#ff0000"
+        }
+      },
+      {
+        "scope": "assigner",
+        "light": {
+          "foreground": "#ffffcc"
+        },
+        "dark": {
+          "foreground": "#ffffcc"
+        }
       }
-    }
+    ]
   },
   "scripts": {
     "lint": "eslint .",

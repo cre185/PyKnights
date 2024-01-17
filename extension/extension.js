@@ -3,10 +3,9 @@
 const vscode = require('vscode');
 
 const legend = new vscode.SemanticTokensLegend(
-	[reserved, constant, operator, sepertor, string, space, cpmment, error, assigner, variable, function, package],
-	[]
+    ['reserved', 'constant', 'operator', 'separator', 'string', 'space', 'comment', 'error', 'assigner', 'variable', 'function', 'package'],
+    []
 );
-
 class MyDocumentSemanticTokensProvider {
 	constructor() {
 		// nothing to do
@@ -32,7 +31,7 @@ class MyDocumentSemanticTokensProvider {
 		const colors = JSON.parse(fs.readFileSync(filepath, 'utf8'));
 
 		// 3. reinterpret colors to become the data part of SemanticTokens
-		const builder = new vscode.SemanticTokensBuilder();
+		const builder = new vscode.SemanticTokensBuilder(legend);
 		for (const item of colors) {
 			builder.push(
 				item.startLine - 1,
