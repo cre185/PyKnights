@@ -54,7 +54,13 @@ if __name__ == "__main__":
         if value.symbolType == SymbolType.function:
             completion['name'] = key
             completion['type'] = 'Function'
-            completion['detail'] = value.content['parameter']
+            parameter_str = 'parameter: '
+            for item in value.content['parameter']:
+                parameter_str += item + ', '
+            parameter_str = parameter_str[:-2]
+            if parameter_str == 'parameter':
+                parameter_str = 'parameter: None'
+            completion['detail'] = parameter_str
             completionTable.append(completion)
             completion = {}
         elif value.symbolType == SymbolType.variable:
@@ -65,10 +71,13 @@ if __name__ == "__main__":
         elif value.symbolType == SymbolType.package:
             completion['name'] = key
             completion['type'] = 'Class'
-            detail_list = []
+            detail_str = 'content: '
             for key in value.content:
-                detail_list.append(key)
-            completion['detail'] = detail_list
+                detail_str += key + ', '
+            detail_str = detail_str[:-2]
+            if detail_str == 'content':
+                detail_str = 'content: None'
+            completion['detail'] = detail_str
             detail_list = []
             completionTable.append(completion)
             completion = {}
