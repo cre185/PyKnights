@@ -46,8 +46,26 @@ if __name__ == "__main__":
     errorHandler.handleError()
     errorHandler.clear()
     colors = colorTable.getColor(tokens,symbolTable)
+    lines = script.split('\n')
+    new_colors = []
+    for color in colors:
+        if color['startRow'] == color['endRow']:
+            new_colors.append(color)
+        else:
+            for row in range(color['startRow'], color['endRow'] + 1):
+                new_color = copy.deepcopy(color)
+                new_color['startRow'] = row
+                new_color['endRow'] = row
+                if row == color['startRow']:
+                    new_color['endColumn'] = len(lines[row-1])
+                elif row == color['endRow']:
+                    new_color['startColumn'] = 1
+                else:
+                    new_color['startColumn'] = 1
+                    new_color['endColumn'] = len(lines[row-1])
+                new_colors.append(new_color)
     with open('colors.pyknights', 'w') as f:
-        f.write(json.dumps(colors))
+        f.write(json.dumps(new_colors))
     completionTable = []
     completion = {}
     for key, value in symbolTable.items():
@@ -83,4 +101,3 @@ if __name__ == "__main__":
             completion = {}
     with open('completions.pyknights', 'w') as f:
         f.write(json.dumps(completionTable))
-    # generate_HTML(script, colors)

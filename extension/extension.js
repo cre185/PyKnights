@@ -3,7 +3,7 @@
 const vscode = require('vscode');
 
 const legend = new vscode.SemanticTokensLegend(
-    ['keyword', 'constant', 'operator', 'separator', 'string', 'space', 'comment', 'error', 'operator', 'variable', 'function', 'namespace'],
+    ['keyword', 'number', 'operator', 'oparator', 'string', 'space', 'comment', 'error', 'operator', 'variable', 'function', 'namespace'],
 	[]
 );
 class MyDocumentSemanticTokensProvider {
@@ -35,7 +35,6 @@ class MyDocumentSemanticTokensProvider {
 					item.type
 				);
 			}
-			//console.log(builder.build());
 			return builder.build();
 		}
 	}
@@ -82,18 +81,6 @@ function activate(context) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This row of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "pyknights" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('pyknights.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from PyKnights!');
-	});
-
-	context.subscriptions.push(disposable);
 
 	context.subscriptions.push(vscode.languages.registerDocumentSemanticTokensProvider(
 		{ language: 'python' },

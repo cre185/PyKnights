@@ -3,6 +3,7 @@
   "displayName": "PyKnights",
   "description": "Code highlight and auto completion for python",
   "version": "0.0.1",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -14,145 +15,19 @@
   ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "pyknights.helloWorld",
-        "title": "Hello World"
-      }
-    ],
-    "colors": [
-      {
-        "id": "pyknights.color1",
-        "description": "The color used for the status bar background.",
-        "defaults": {
-          "dark": "#00FF00",
-          "light": "#00FF00",
-          "highContrast": "#00FF00"
-        }
-      }
-    ],
     "grammars": [
       {
         "language": "python",
         "scopeName": "source.pyknightsPython",
         "path": "./syntaxes/pyknightsPython.tmLanguage.json"
       }
-    ],
-    "semanticTokenScopes": [
-      {
-        "scope": "reserved",
-        "light": {
-          "foreground": "#da70d6"
-        },
-        "dark": {
-          "foreground": "#da70d6"
-        }
-      },
-      {
-        "scope": "identifier",
-        "light": {
-          "foreground": "#00fa9a"
-        },
-        "dark": {
-          "foreground": "#00fa9a"
-        }
-      },
-      {
-        "scope": "function",
-        "light": {
-          "foreground": "#0080ff"
-        },
-        "dark": {
-          "foreground": "#0080ff"
-        }
-      },
-      {
-        "scope": "package",
-        "light": {
-          "foreground": "#22FF22"
-        },
-        "dark": {
-          "foreground": "#22FF22"
-        }
-      },
-      {
-        "scope": "constant",
-        "light": {
-          "foreground": "#f0e68c"
-        },
-        "dark": {
-          "foreground": "#f0e68c"
-        }
-      },
-      {
-        "scope": "operator",
-        "light": {
-          "foreground": "#22FF22"
-        },
-        "dark": {
-          "foreground": "#CCFF00"
-        }
-      },
-      {
-        "scope": "separator",
-        "light": {
-          "foreground": "black"
-        },
-        "dark": {
-          "foreground": "#ffffff"
-        }
-      },
-      {
-        "scope": "string",
-        "light": {
-          "foreground": "#ff7700"
-        },
-        "dark": {
-          "foreground": "#ff7700"
-        }
-      },
-      {
-        "scope": "space",
-        "light": {
-          "foreground": "#ffffff"
-        },
-        "dark": {
-          "foreground": "#ffffff"
-        }
-      },
-      {
-        "scope": "comment",
-        "light": {
-          "foreground": "#808080"
-        },
-        "dark": {
-          "foreground": "#808080"
-        }
-      },
-      {
-        "scope": "error",
-        "light": {
-          "foreground": "#ff0000"
-        },
-        "dark": {
-          "foreground": "#ff0000"
-        }
-      },
-      {
-        "scope": "assigner",
-        "light": {
-          "foreground": "#ffffcc"
-        },
-        "dark": {
-          "foreground": "#ffffcc"
-        }
-      }
     ]
   },
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "package": "pnpm vsce package --no-dependencies"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",

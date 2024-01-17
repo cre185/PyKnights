@@ -1,7 +1,9 @@
 ## PyKnights  
 PyKnights是一个为python语言提供代码高亮与提示功能的VSCode插件   
+### 插件  
+使用`pnpm run package`即可打包出VSIX文件 之后导入到VSCode即可  
 ### 测试  
-在analyzer目录下运行  
+如果希望不使用插件而调试程序的话可以在analyzer目录下运行  
 建议首先创建虚拟环境 不过这一步是可选的  
 ```bash
 conda create -n pyknights python=3.11
