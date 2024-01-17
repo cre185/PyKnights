@@ -3,6 +3,9 @@ from utils import SymbolType
 class SymbolProp:
     def __init__(self, symbolType):
         self.symbolType = symbolType
+        if symbolType == SymbolType.function:
+            self.content = {'parameter': []}
+            return
         self.content = {}
 
     def __str__(self):

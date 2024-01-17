@@ -35,7 +35,7 @@ class MyDocumentSemanticTokensProvider {
 					item.type
 				);
 			}
-			console.log(builder.build());
+			//console.log(builder.build());
 			return builder.build();
 		}
 	}
@@ -59,8 +59,12 @@ class MyCompletionItemProvider {
 			const path = require('path');
 			const filepath = path.join(__dirname, './completions.pyknights');
 			const completions = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+			console.log(completions);
 			return completions.map(completion => {
 				let item = new vscode.CompletionItem(completion.name, vscode.CompletionItemKind[completion.type]);
+				if(completion.type == 'Function' || completion.type == 'Class'){
+					item.detail = completion.detail;
+				}
 				return item;
 			});
 		}

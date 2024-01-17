@@ -54,6 +54,7 @@ if __name__ == "__main__":
         if value.symbolType == SymbolType.function:
             completion['name'] = key
             completion['type'] = 'Function'
+            completion['detail'] = value.content['parameter']
             completionTable.append(completion)
             completion = {}
         elif value.symbolType == SymbolType.variable:
@@ -64,6 +65,11 @@ if __name__ == "__main__":
         elif value.symbolType == SymbolType.package:
             completion['name'] = key
             completion['type'] = 'Class'
+            detail_list = []
+            for key in value.content:
+                detail_list.append(key)
+            completion['detail'] = detail_list
+            detail_list = []
             completionTable.append(completion)
             completion = {}
     with open('completions.pyknights', 'w') as f:
