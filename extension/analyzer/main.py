@@ -41,16 +41,11 @@ if __name__ == "__main__":
             parse_tree.to_graphviz('tree.dot')
         SE.analyze(parse_tree)
         print('semantic analysis finished')
-        errorHandler.handleError()
-        errorHandler.clear()
-        colors = colorTable.getColor(tokens,symbolTable)
-        with open('colors.pyknights', 'w') as f:
-            f.write(str(colors))
-        generate_HTML(script, colors)
     except:
-        errorHandler.handleError()
-        errorHandler.clear()
-        colors = colorTable.getColor(tokens,symbolTable)
-        with open('colors.pyknights', 'w') as f:
-            f.write(str(colors))
-        generate_HTML(script, colors)
+        pass
+    errorHandler.handleError()
+    errorHandler.clear()
+    colors = colorTable.getColor(tokens,symbolTable)
+    with open('colors.pyknights', 'w') as f:
+        f.write(str(colors))
+    generate_HTML(script, colors)

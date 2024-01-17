@@ -120,5 +120,6 @@ function deactivate() {}
 module.exports = {
 	activate,
 	deactivate,
-	MyDocumentSemanticTokensProvider
+	MyDocumentSemanticTokensProvider,
+	MyCompletionItemProvider
 }
